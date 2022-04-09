@@ -1,7 +1,6 @@
 <script>
   import { inertia } from '@inertiajs/inertia-svelte';
-
-  // states
+  // props
   export let text = 'Link';
   export let to = '/';
 </script>

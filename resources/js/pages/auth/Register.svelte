@@ -2,10 +2,12 @@
   import Guests from '../../layouts/Guests.svelte';
 </script>
 
+<svelte:head>
+  <title>ConnectVet ─ Register</title>
+</svelte:head>
+
 <Guests>
-  <main>
-    <h1>Register page!</h1>
-  </main>
+  <h1>Register page!</h1>
 </Guests>
 
 <style>

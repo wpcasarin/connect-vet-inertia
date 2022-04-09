@@ -3558,91 +3558,58 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
-function create_default_slot(ctx) {
-  var t;
-  return {
-    c: function c() {
-      t = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.text)(
-      /*text*/
-      ctx[0]);
-    },
-    m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t, anchor);
-    },
-    p: function p(ctx, dirty) {
-      if (dirty &
-      /*text*/
-      1) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.set_data)(t,
-      /*text*/
-      ctx[0]);
-    },
-    d: function d(detaching) {
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t);
-    }
-  };
-}
-
 function create_fragment(ctx) {
   var li;
-  var link;
-  var current;
-  link = new _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_1__.Link({
-    props: {
-      href:
-      /*to*/
-      ctx[1],
-      $$slots: {
-        "default": [create_default_slot]
-      },
-      $$scope: {
-        ctx: ctx
-      }
-    }
-  });
+  var a;
+  var t;
+  var inertia_action;
+  var mounted;
+  var dispose;
   return {
     c: function c() {
       li = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("li");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(link.$$.fragment);
+      a = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("a");
+      t = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.text)(
+      /*text*/
+      ctx[0]);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a, "href",
+      /*to*/
+      ctx[1]);
     },
     m: function m(target, anchor) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, li, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(link, li, null);
-      current = true;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(li, a);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(a, t);
+
+      if (!mounted) {
+        dispose = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.action_destroyer)(inertia_action = _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_1__.inertia.call(null, a));
+        mounted = true;
+      }
     },
     p: function p(ctx, _ref) {
       var _ref2 = _slicedToArray(_ref, 1),
           dirty = _ref2[0];
 
-      var link_changes = {};
       if (dirty &
-      /*to*/
-      2) link_changes.href =
-      /*to*/
-      ctx[1];
+      /*text*/
+      1) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.set_data)(t,
+      /*text*/
+      ctx[0]);
 
       if (dirty &
-      /*$$scope, text*/
-      5) {
-        link_changes.$$scope = {
-          dirty: dirty,
-          ctx: ctx
-        };
+      /*to*/
+      2) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a, "href",
+        /*to*/
+        ctx[1]);
       }
-
-      link.$set(link_changes);
     },
-    i: function i(local) {
-      if (current) return;
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(link.$$.fragment, local);
-      current = true;
-    },
-    o: function o(local) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(link.$$.fragment, local);
-      current = false;
-    },
+    i: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
+    o: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
     d: function d(detaching) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(li);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(link);
+      mounted = false;
+      dispose();
     }
   };
 }
@@ -3683,6 +3650,486 @@ var NavBarLinkButton = /*#__PURE__*/function (_SvelteComponent) {
 }(svelte_internal__WEBPACK_IMPORTED_MODULE_0__.SvelteComponent);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (NavBarLinkButton);
+
+/***/ }),
+
+/***/ "./resources/js/components/forms/LoginForm.svelte":
+/*!********************************************************!*\
+  !*** ./resources/js/components/forms/LoginForm.svelte ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var svelte_internal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! svelte/internal */ "./node_modules/svelte/internal/index.mjs");
+/* harmony import */ var _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../inputs/FormInput.svelte */ "./resources/js/components/inputs/FormInput.svelte");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+/* resources/js/components/forms/LoginForm.svelte generated by Svelte v3.47.0 */
+
+
+
+function create_fragment(ctx) {
+  var form;
+  var forminput0;
+  var updating_value;
+  var t0;
+  var forminput1;
+  var updating_value_1;
+  var t1;
+  var label;
+  var t3;
+  var button;
+  var current;
+  var mounted;
+  var dispose;
+
+  function forminput0_value_binding(value) {
+    /*forminput0_value_binding*/
+    ctx[3](value);
+  }
+
+  var forminput0_props = {
+    type: "text",
+    label: "email address",
+    placeholder: "john.doe@mail.com"
+  };
+
+  if (
+  /*email*/
+  ctx[0] !== void 0) {
+    forminput0_props.value =
+    /*email*/
+    ctx[0];
+  }
+
+  forminput0 = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
+    props: forminput0_props
+  });
+  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput0, 'value', forminput0_value_binding);
+  });
+
+  function forminput1_value_binding(value) {
+    /*forminput1_value_binding*/
+    ctx[4](value);
+  }
+
+  var forminput1_props = {
+    type: "password",
+    label: "password",
+    placeholder: "******"
+  };
+
+  if (
+  /*password*/
+  ctx[1] !== void 0) {
+    forminput1_props.value =
+    /*password*/
+    ctx[1];
+  }
+
+  forminput1 = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
+    props: forminput1_props
+  });
+  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput1, 'value', forminput1_value_binding);
+  });
+  return {
+    c: function c() {
+      form = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.element)("form");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(forminput0.$$.fragment);
+      t0 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(forminput1.$$.fragment);
+      t1 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
+      label = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.element)("label");
+      label.innerHTML = "<a id=\"forgot-pwd\" href=\"/\" class=\"link link-hover label-text-alt text-sm underline\">Forgot password?</a>";
+      t3 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
+      button = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.element)("button");
+      button.textContent = "Login";
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(label, "for", "forgot-pwd");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(label, "class", "label");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(button, "class", "btn btn-primary");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(form, "class", "card-body bg-base-100");
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, form, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(forminput0, form, null);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.append)(form, t0);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(forminput1, form, null);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.append)(form, t1);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.append)(form, label);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.append)(form, t3);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.append)(form, button);
+      current = true;
+
+      if (!mounted) {
+        dispose = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.listen)(form, "submit", (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.prevent_default)(
+        /*handleSubmit*/
+        ctx[2]));
+        mounted = true;
+      }
+    },
+    p: function p(ctx, _ref) {
+      var _ref2 = _slicedToArray(_ref, 1),
+          dirty = _ref2[0];
+
+      var forminput0_changes = {};
+
+      if (!updating_value && dirty &
+      /*email*/
+      1) {
+        updating_value = true;
+        forminput0_changes.value =
+        /*email*/
+        ctx[0];
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
+          return updating_value = false;
+        });
+      }
+
+      forminput0.$set(forminput0_changes);
+      var forminput1_changes = {};
+
+      if (!updating_value_1 && dirty &
+      /*password*/
+      2) {
+        updating_value_1 = true;
+        forminput1_changes.value =
+        /*password*/
+        ctx[1];
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
+          return updating_value_1 = false;
+        });
+      }
+
+      forminput1.$set(forminput1_changes);
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(forminput0.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(forminput1.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(forminput0.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(forminput1.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(form);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminput0);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminput1);
+      mounted = false;
+      dispose();
+    }
+  };
+}
+
+function instance($$self, $$props, $$invalidate) {
+  var email = '';
+  var password = ''; // methods
+
+  var handleSubmit = /*#__PURE__*/function () {
+    var _ref3 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              console.log(email);
+              console.log(password);
+
+            case 2:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }));
+
+    return function handleSubmit() {
+      return _ref3.apply(this, arguments);
+    };
+  }();
+
+  function forminput0_value_binding(value) {
+    email = value;
+    $$invalidate(0, email);
+  }
+
+  function forminput1_value_binding(value) {
+    password = value;
+    $$invalidate(1, password);
+  }
+
+  return [email, password, handleSubmit, forminput0_value_binding, forminput1_value_binding];
+}
+
+var LoginForm = /*#__PURE__*/function (_SvelteComponent) {
+  _inherits(LoginForm, _SvelteComponent);
+
+  var _super = _createSuper(LoginForm);
+
+  function LoginForm(options) {
+    var _this;
+
+    _classCallCheck(this, LoginForm);
+
+    _this = _super.call(this);
+    (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.init)(_assertThisInitialized(_this), options, instance, create_fragment, svelte_internal__WEBPACK_IMPORTED_MODULE_1__.safe_not_equal, {});
+    return _this;
+  }
+
+  return _createClass(LoginForm);
+}(svelte_internal__WEBPACK_IMPORTED_MODULE_1__.SvelteComponent);
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LoginForm);
+
+/***/ }),
+
+/***/ "./resources/js/components/inputs/FormInput.svelte":
+/*!*********************************************************!*\
+  !*** ./resources/js/components/inputs/FormInput.svelte ***!
+  \*********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var svelte_internal__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! svelte/internal */ "./node_modules/svelte/internal/index.mjs");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+/* resources/js/components/inputs/FormInput.svelte generated by Svelte v3.47.0 */
+
+
+function create_fragment(ctx) {
+  var div;
+  var label_1;
+  var span;
+  var t0;
+  var label_1_for_value;
+  var t1;
+  var input;
+  var input_id_value;
+  var mounted;
+  var dispose;
+  return {
+    c: function c() {
+      div = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("div");
+      label_1 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("label");
+      span = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("span");
+      t0 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.text)(
+      /*label*/
+      ctx[2]);
+      t1 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      input = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("input");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span, "class", "label-text");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(label_1, "for", label_1_for_value =
+      /*generateId*/
+      ctx[4]());
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(label_1, "class", "label capitalize");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(input, "id", input_id_value =
+      /*generateId*/
+      ctx[4]());
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(input, "type",
+      /*type*/
+      ctx[1]);
+      input.value =
+      /*value*/
+      ctx[0];
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(input, "placeholder",
+      /*placeholder*/
+      ctx[3]);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(input, "class", "input input-bordered");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div, "class", "form-control");
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, div, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div, label_1);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(label_1, span);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(span, t0);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div, t1);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div, input);
+
+      if (!mounted) {
+        dispose = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.listen)(input, "input",
+        /*handleInput*/
+        ctx[5]);
+        mounted = true;
+      }
+    },
+    p: function p(ctx, _ref) {
+      var _ref2 = _slicedToArray(_ref, 1),
+          dirty = _ref2[0];
+
+      if (dirty &
+      /*label*/
+      4) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.set_data)(t0,
+      /*label*/
+      ctx[2]);
+
+      if (dirty &
+      /*type*/
+      2) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(input, "type",
+        /*type*/
+        ctx[1]);
+      }
+
+      if (dirty &
+      /*value*/
+      1 && input.value !==
+      /*value*/
+      ctx[0]) {
+        input.value =
+        /*value*/
+        ctx[0];
+      }
+
+      if (dirty &
+      /*placeholder*/
+      8) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(input, "placeholder",
+        /*placeholder*/
+        ctx[3]);
+      }
+    },
+    i: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
+    o: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
+    d: function d(detaching) {
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(div);
+      mounted = false;
+      dispose();
+    }
+  };
+}
+
+function instance($$self, $$props, $$invalidate) {
+  var type = $$props.type;
+  var label = $$props.label;
+  var value = $$props.value;
+  var placeholder = $$props.placeholder; // generate id for label
+
+  var generateId = function generateId() {
+    return "form-input-".concat(label);
+  }; // handle dynamic inputs wih two-way binding
+
+
+  var handleInput = function handleInput(e) {
+    $$invalidate(0, value = type.match(/^(number|range)$/) ? +e.target.value : e.target.value);
+  };
+
+  $$self.$$set = function ($$props) {
+    if ('type' in $$props) $$invalidate(1, type = $$props.type);
+    if ('label' in $$props) $$invalidate(2, label = $$props.label);
+    if ('value' in $$props) $$invalidate(0, value = $$props.value);
+    if ('placeholder' in $$props) $$invalidate(3, placeholder = $$props.placeholder);
+  };
+
+  return [value, type, label, placeholder, generateId, handleInput];
+}
+
+var FormInput = /*#__PURE__*/function (_SvelteComponent) {
+  _inherits(FormInput, _SvelteComponent);
+
+  var _super = _createSuper(FormInput);
+
+  function FormInput(options) {
+    var _this;
+
+    _classCallCheck(this, FormInput);
+
+    _this = _super.call(this);
+    (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.init)(_assertThisInitialized(_this), options, instance, create_fragment, svelte_internal__WEBPACK_IMPORTED_MODULE_0__.safe_not_equal, {
+      type: 1,
+      label: 2,
+      value: 0,
+      placeholder: 3
+    });
+    return _this;
+  }
+
+  return _createClass(FormInput);
+}(svelte_internal__WEBPACK_IMPORTED_MODULE_0__.SvelteComponent);
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FormInput);
 
 /***/ }),
 
@@ -3807,6 +4254,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 
 function create_fragment(ctx) {
+  var header;
   var nav;
   var navbardrawerbutton;
   var t0;
@@ -3833,6 +4281,7 @@ function create_fragment(ctx) {
   });
   return {
     c: function c() {
+      header = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("header");
       nav = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("nav");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(navbardrawerbutton.$$.fragment);
       t0 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
@@ -3847,10 +4296,12 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div0, "class", "mx-2 flex-1 px-2");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(ul, "class", "menu menu-horizontal");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div1, "class", "hidden flex-none lg:block");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(nav, "class", "navbar w-full bg-base-300");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(nav, "class", "container navbar mx-auto p-0");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(header, "class", "w-full bg-base-300");
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, nav, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, header, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(header, nav);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(navbardrawerbutton, nav, null);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(nav, t0);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(nav, div0);
@@ -3877,7 +4328,7 @@ function create_fragment(ctx) {
       current = false;
     },
     d: function d(detaching) {
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(nav);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(header);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(navbardrawerbutton);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(navbarlinkbutton0);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(navbarlinkbutton1);
@@ -3967,6 +4418,7 @@ function create_fragment(ctx) {
   var div0;
   var navbar;
   var t1;
+  var main;
   var t2;
   var drawer;
   var current;
@@ -3986,14 +4438,16 @@ function create_fragment(ctx) {
       div0 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("div");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(navbar.$$.fragment);
       t1 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      main = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("main");
       if (default_slot) default_slot.c();
       t2 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(drawer.$$.fragment);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(input, "id", "main-drawer");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(input, "type", "checkbox");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(input, "class", "drawer-toggle");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(main, "class", "container mx-auto");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div0, "class", "drawer-content flex flex-col");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div1, "class", "drawer");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div1, "class", "drawer bg-base-200");
     },
     m: function m(target, anchor) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, div1, anchor);
@@ -4002,9 +4456,10 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div1, div0);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(navbar, div0, null);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div0, t1);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div0, main);
 
       if (default_slot) {
-        default_slot.m(div0, null);
+        default_slot.m(main, null);
       }
 
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div1, t2);
@@ -4137,23 +4592,24 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 function create_default_slot(ctx) {
-  var main;
+  var section;
   return {
     c: function c() {
-      main = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("main");
-      main.innerHTML = "<h1>Hello world</h1>";
+      section = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("section");
+      section.innerHTML = "<h1>Hello world</h1>";
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, main, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, section, anchor);
     },
     p: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
     d: function d(detaching) {
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(main);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(section);
     }
   };
 }
 
 function create_fragment(ctx) {
+  var t;
   var guests;
   var current;
   guests = new _layouts_Guests_svelte__WEBPACK_IMPORTED_MODULE_1__["default"]({
@@ -4168,9 +4624,12 @@ function create_fragment(ctx) {
   });
   return {
     c: function c() {
+      t = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(guests.$$.fragment);
+      document.title = "ConnectVet";
     },
     m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t, anchor);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(guests, target, anchor);
       current = true;
     },
@@ -4201,6 +4660,7 @@ function create_fragment(ctx) {
       current = false;
     },
     d: function d(detaching) {
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(guests, detaching);
     }
   };
@@ -4241,6 +4701,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var svelte_internal__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! svelte/internal */ "./node_modules/svelte/internal/index.mjs");
 /* harmony import */ var _layouts_Guests_svelte__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../layouts/Guests.svelte */ "./resources/js/layouts/Guests.svelte");
+/* harmony import */ var _components_forms_LoginForm_svelte__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/forms/LoginForm.svelte */ "./resources/js/components/forms/LoginForm.svelte");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -4279,24 +4740,42 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+
 function create_default_slot(ctx) {
-  var main;
+  var section;
+  var loginform;
+  var current;
+  loginform = new _components_forms_LoginForm_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({});
   return {
     c: function c() {
-      main = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("main");
-      main.innerHTML = "<h1>Login page!</h1>";
+      section = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("section");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(loginform.$$.fragment);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(section, "class", "card max-w-2xl");
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, main, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, section, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(loginform, section, null);
+      current = true;
     },
     p: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(loginform.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(loginform.$$.fragment, local);
+      current = false;
+    },
     d: function d(detaching) {
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(main);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(section);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(loginform);
     }
   };
 }
 
 function create_fragment(ctx) {
+  var t;
   var guests;
   var current;
   guests = new _layouts_Guests_svelte__WEBPACK_IMPORTED_MODULE_1__["default"]({
@@ -4311,9 +4790,12 @@ function create_fragment(ctx) {
   });
   return {
     c: function c() {
+      t = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(guests.$$.fragment);
+      document.title = "ConnectVet ─ Login";
     },
     m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t, anchor);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(guests, target, anchor);
       current = true;
     },
@@ -4344,6 +4826,7 @@ function create_fragment(ctx) {
       current = false;
     },
     d: function d(detaching) {
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(guests, detaching);
     }
   };
@@ -4423,23 +4906,24 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 function create_default_slot(ctx) {
-  var main;
+  var h1;
   return {
     c: function c() {
-      main = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("main");
-      main.innerHTML = "<h1>Register page!</h1>";
+      h1 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("h1");
+      h1.textContent = "Register page!";
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, main, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, h1, anchor);
     },
     p: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
     d: function d(detaching) {
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(main);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(h1);
     }
   };
 }
 
 function create_fragment(ctx) {
+  var t;
   var guests;
   var current;
   guests = new _layouts_Guests_svelte__WEBPACK_IMPORTED_MODULE_1__["default"]({
@@ -4454,9 +4938,12 @@ function create_fragment(ctx) {
   });
   return {
     c: function c() {
+      t = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(guests.$$.fragment);
+      document.title = "ConnectVet ─ Register";
     },
     m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t, anchor);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(guests, target, anchor);
       current = true;
     },
@@ -4487,6 +4974,7 @@ function create_fragment(ctx) {
       current = false;
     },
     d: function d(detaching) {
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(guests, detaching);
     }
   };

@@ -3,13 +3,15 @@
   import NavBar from '../components/layout/NavBar.svelte';
 </script>
 
-<div class="drawer">
+<div class="drawer bg-base-200">
   <input id="main-drawer" type="checkbox" class="drawer-toggle" />
   <div class="drawer-content flex flex-col">
     <!-- Navbar -->
     <NavBar />
     <!-- Page content here -->
-    <slot />
+    <main class="container mx-auto">
+      <slot />
+    </main>
   </div>
   <!-- Drawer-->
   <Drawer />

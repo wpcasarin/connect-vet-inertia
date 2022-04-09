@@ -3,8 +3,8 @@
   export let type;
   export let label;
   export let value;
+  export let error;
   export let placeholder;
-
   // generate id for label
   const generateId = () => `form-input-${label}`;
   // handle dynamic inputs wih two-way binding
@@ -22,7 +22,7 @@
     type="{type}"
     value="{value}"
     placeholder="{placeholder}"
-    class="input input-bordered"
+    class="{`input input-bordered ${error && 'input-error'}`}"
     on:input="{handleInput}" />
 </div>
 

@@ -14,8 +14,8 @@
 </script>
 
 <div class="form-control">
-  <label for="{generateId()}" class="label capitalize">
-    <span class="label-text">{label}</span>
+  <label for="{generateId()}" class="label px-0">
+    <span class="label-text font-medium first-letter:capitalize">{label}</span>
   </label>
   <input
     id="{generateId()}"

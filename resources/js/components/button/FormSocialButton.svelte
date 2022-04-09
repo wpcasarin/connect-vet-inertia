@@ -1,6 +1,5 @@
 <script>
   import { inertia } from '@inertiajs/inertia-svelte';
-
   // props
   export let to = '/';
 </script>

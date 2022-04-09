@@ -1,6 +1,6 @@
 <script>
   import Auth from '../../layouts/Auth.svelte';
-  import LoginForm from '../../components/forms/LoginForm.svelte';
+  import LoginForm from '../../components/layout/form/LoginForm.svelte';
 </script>
 
 <svelte:head>
@@ -8,22 +8,11 @@
 </svelte:head>
 
 <Auth>
-  <div class="bg-image"></div>
   <section
-    class="min-h-screen max-w-3xl bg-base-100 p-2 sm:p-20 md:p-24 lg:p-28">
+    class="mx-auto flex min-h-screen max-w-3xl bg-base-100 pt-28 lg:mx-0 lg:max-w-2xl lg:p-28 xl:max-w-3xl">
     <LoginForm />
   </section>
 </Auth>
 
 <style>
-  .bg-image {
-    position: absolute;
-    height: 100vh;
-    inset: 0;
-    z-index: -1;
-    background-image: url('assets/login_bg.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-  }
 </style>

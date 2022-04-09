@@ -29,6 +29,7 @@
         "@inertiajs/inertia-svelte": "^0.8.0",
         "@inertiajs/progress": "^0.2.7",
         "daisyui": "^2.13.6",
-        "laravel-mix-svelte": "github:wewowweb/laravel-mix-svelte"
+        "laravel-mix-svelte": "github:wewowweb/laravel-mix-svelte",
+        "svelte-icons": "^2.1.0"
     }
 }

@@ -1,3 +1,6 @@
+// tailwind.config.js
+const defaultTheme = require('tailwindcss/defaultTheme');
+
 module.exports = {
   mode: 'jit',
   content: [
@@ -8,6 +11,10 @@ module.exports = {
     './resources/**/*.svelte',
   ],
   theme: {
+    screens: {
+      xs: '360px',
+      ...defaultTheme.screens,
+    },
     extend: {
       fontFamily: {
         sans: ['Inter var', 'sans-serif'],

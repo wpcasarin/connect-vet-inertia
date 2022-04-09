@@ -1,5 +1,5 @@
 <script>
-  import { inertia, Link } from '@inertiajs/inertia-svelte';
+  import { inertia } from '@inertiajs/inertia-svelte';
 
   // states
   export let text = 'Link';
@@ -7,7 +7,9 @@
 </script>
 
 <li>
-  <Link href="{to}">{text}</Link>
+  <a href="{to}" use:inertia>
+    {text}
+  </a>
 </li>
 
 <style>

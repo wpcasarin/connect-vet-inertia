@@ -7,7 +7,6 @@ module.exports = {
     './resources/**/*.js',
     './resources/**/*.svelte',
   ],
-
   theme: {
     extend: {
       fontFamily: {
@@ -15,6 +14,8 @@ module.exports = {
       },
     },
   },
-
   plugins: [require('daisyui')],
+  daisyui: {
+    themes: ['cupcake'],
+  },
 };

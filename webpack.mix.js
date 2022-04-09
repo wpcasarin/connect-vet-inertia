@@ -1,5 +1,5 @@
-const mix = require("laravel-mix");
-require("laravel-mix-svelte");
+const mix = require('laravel-mix');
+require('laravel-mix-svelte');
 
 /*
  |--------------------------------------------------------------------------
@@ -12,9 +12,12 @@ require("laravel-mix-svelte");
  |
  */
 
-mix.js("resources/js/app.js", "public/js")
-    .postCss("resources/css/app.css", "public/css", [
-        //
-    ])
-    .svelte()
-    .browserSync("127.0.0.1:8000");
+mix
+  .js('resources/js/app.js', 'public/js')
+  .postCss('resources/css/app.css', 'public/css', [
+    require('postcss-import'),
+    require('tailwindcss'),
+    require('autoprefixer'),
+  ])
+  .svelte()
+  .browserSync('127.0.0.1:8000');

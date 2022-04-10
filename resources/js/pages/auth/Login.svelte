@@ -1,6 +1,7 @@
 <script>
   import Auth from '../../layouts/Auth.svelte';
-  import LoginForm from '../../components/layout/form/LoginForm.svelte';
+  import LoginForm from '../../components/layout/forms/LoginForm.svelte';
+  import AuthFormContainer from '../../components/containers/AuthFormContainer.svelte';
 </script>
 
 <svelte:head>
@@ -8,10 +9,9 @@
 </svelte:head>
 
 <Auth>
-  <section
-    class="mx-auto flex min-h-screen max-w-3xl bg-base-100 pt-28 lg:mx-0 lg:max-w-2xl lg:p-28 xl:max-w-3xl">
+  <AuthFormContainer>
     <LoginForm />
-  </section>
+  </AuthFormContainer>
 </Auth>
 
 <style>

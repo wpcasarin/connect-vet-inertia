@@ -1,6 +1,6 @@
 <script>
-  import NavBarDrawerButton from '../button/NavBarDrawerButton.svelte';
-  import NavBarLinkButton from '../button/NavBarLinkButton.svelte';
+  import NavBarDrawerButton from '../buttons/NavBarDrawerButton.svelte';
+  import NavBarLinkButton from '../buttons/NavBarLinkButton.svelte';
 </script>
 
 <header class="w-full bg-base-300">

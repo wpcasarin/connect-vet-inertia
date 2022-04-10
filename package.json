@@ -30,6 +30,7 @@
         "@inertiajs/progress": "^0.2.7",
         "daisyui": "^2.13.6",
         "laravel-mix-svelte": "github:wewowweb/laravel-mix-svelte",
-        "svelte-icons": "^2.1.0"
+        "svelte-icons": "^2.1.0",
+        "uuid": "^8.3.2"
     }
 }

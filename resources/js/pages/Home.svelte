@@ -1,5 +1,6 @@
 <script>
   import Guests from '../layouts/Guests.svelte';
+  import HeroSection from '../components/layout/HeroSection.svelte';
 </script>
 
 <svelte:head>
@@ -7,7 +8,7 @@
 </svelte:head>
 
 <Guests>
-  <section><h1>Hello world</h1></section>
+  <HeroSection />
 </Guests>
 
 <style>

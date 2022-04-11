@@ -2,12 +2,12 @@
   import NavBar from '../components/layout/NavBar.svelte';
 </script>
 
-<!-- Navbar -->
-<NavBar />
-<!-- Page content here -->
-<main class="container-fluid mx-auto px-2 sm:container sm:px-4">
+<div class="flex h-screen flex-grow flex-col">
+  <!-- Navbar -->
+  <NavBar />
+  <!-- Page content here -->
   <slot />
-</main>
+</div>
 
 <style>
   /* your styles go here */

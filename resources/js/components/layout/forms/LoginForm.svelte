@@ -85,7 +85,7 @@
       <FormAlert open="{true}" text="{handleFormErrorMessage($form.errors)}" />
     {/if}
     <!-- submit button -->
-    <Button text="Sign in" type="submit" />
+    <Button text="Sign in" type="submit" disabled="{$form.processing}" />
   </div>
 </Form>
 

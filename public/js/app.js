@@ -6692,6 +6692,9 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(button, "type",
       /*type*/
       ctx[1]);
+      button.disabled =
+      /*disabled*/
+      ctx[2];
     },
     m: function m(target, anchor) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, button, anchor);
@@ -6714,6 +6717,14 @@ function create_fragment(ctx) {
         /*type*/
         ctx[1]);
       }
+
+      if (dirty &
+      /*disabled*/
+      4) {
+        button.disabled =
+        /*disabled*/
+        ctx[2];
+      }
     },
     i: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
     o: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
@@ -6728,13 +6739,16 @@ function instance($$self, $$props, $$invalidate) {
       text = _$$props$text === void 0 ? 'button' : _$$props$text;
   var _$$props$type = $$props.type,
       type = _$$props$type === void 0 ? 'button' : _$$props$type;
+  var _$$props$disabled = $$props.disabled,
+      disabled = _$$props$disabled === void 0 ? false : _$$props$disabled;
 
   $$self.$$set = function ($$props) {
     if ('text' in $$props) $$invalidate(0, text = $$props.text);
     if ('type' in $$props) $$invalidate(1, type = $$props.type);
+    if ('disabled' in $$props) $$invalidate(2, disabled = $$props.disabled);
   };
 
-  return [text, type];
+  return [text, type, disabled];
 }
 
 var Button = /*#__PURE__*/function (_SvelteComponent) {
@@ -6750,7 +6764,8 @@ var Button = /*#__PURE__*/function (_SvelteComponent) {
     _this = _super.call(this);
     (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.init)(_assertThisInitialized(_this), options, instance, create_fragment, svelte_internal__WEBPACK_IMPORTED_MODULE_0__.safe_not_equal, {
       text: 0,
-      type: 1
+      type: 1,
+      disabled: 2
     });
     return _this;
   }
@@ -9151,7 +9166,10 @@ function create_default_slot(ctx) {
   button = new _buttons_Button_svelte__WEBPACK_IMPORTED_MODULE_11__["default"]({
     props: {
       text: "Sign in",
-      type: "submit"
+      type: "submit",
+      disabled:
+      /*$form*/
+      ctx[0].processing
     }
   });
   return {
@@ -9274,6 +9292,14 @@ function create_default_slot(ctx) {
         });
         (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
       }
+
+      var button_changes = {};
+      if (dirty &
+      /*$form*/
+      1) button_changes.disabled =
+      /*$form*/
+      ctx[0].processing;
+      button.$set(button_changes);
     },
     i: function i(local) {
       if (current) return;

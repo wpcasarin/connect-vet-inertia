@@ -1,7 +1,5 @@
 <script>
-  import axios from 'axios';
-  import { inertia } from '@inertiajs/inertia-svelte';
-  import { Inertia } from '@inertiajs/inertia';
+  import { inertia, useForm } from '@inertiajs/inertia-svelte';
   // local imports
   import SocialButtonGroup from '../../util/SocialButtonGroup.svelte';
   import FormInputSelect from '../../inputs/FormInputSelect.svelte';
@@ -13,9 +11,9 @@
   import FormLogo from '../../logos/FormLogo.svelte';
   import Form from '../../basics/Form.svelte';
   import Button from '../../buttons/Button.svelte';
-  import { config } from '../../../config/axios';
+  import { handleFormErrorMessage } from '../../../util';
   // states
-  let formData = {
+  let form = useForm({
     name: '',
     last_name: '',
     email: '',
@@ -23,19 +21,9 @@
     password_confirmation: '',
     tutor_cpf: '',
     vet_crmv: '',
-  };
-  let inputErrors = {
-    name: false,
-    last_name: false,
-    email: false,
-    password: false,
-    password_confirmation: false,
-    tutor_cpf: false,
-    vet_crmv: false,
     type: 'TUTOR',
-  };
-  let errorOpen = false;
-  let errorMessage = '';
+    remember: false,
+  });
   // const
   const inputOptions = [
     {
@@ -48,27 +36,9 @@
     },
   ];
   // methods
-  const handleErrors = (errorData) => {
-    errorOpen = errorData ? true : false;
-    inputErrors.name = 'name' in errorData ? true : false;
-    inputErrors.last_name = 'last_name' in errorData ? true : false;
-    inputErrors.email = 'email' in errorData ? true : false;
-    inputErrors.password = 'password' in errorData ? true : false;
-    inputErrors.tutor_cpf = 'tutor_cpf' in errorData ? true : false;
-    inputErrors.vet_crmv = 'vet_crmv' in errorData ? true : false;
-  };
-  // TODO: use Inertia only
-  const handleSubmit = async () => {
-    // console.log(formData);
-    try {
-      const resp = await axios.post('/register', formData, config);
-      resp.status === 200 && Inertia.reload();
-      handleErrors(null);
-    } catch (error) {
-      errorMessage = error.response.data.message;
-      console.log(error.response.data.errors);
-      handleErrors(error.response.data.errors);
-    }
+  const handleSubmit = () => {
+    $form.clearErrors();
+    $form.post('/register');
   };
 </script>
 
@@ -92,75 +62,123 @@
   <!-- input group 1 -->
   <InputGroup>
     <!-- name input -->
-    <FormInput
-      type="text"
-      label="name"
-      placeholder="John"
-      bind:value={formData.name}
-      bind:error={inputErrors.name} />
+    {#if $form.errors.name}
+      <FormInput
+        type="text"
+        label="name"
+        placeholder="John"
+        error={true}
+        bind:value={$form.name} />
+    {:else}
+      <FormInput
+        type="text"
+        label="name"
+        placeholder="John"
+        bind:value={$form.name} />
+    {/if}
     <!-- last name input -->
-    <FormInput
-      type="text"
-      label="last name"
-      placeholder="Doe"
-      bind:value={formData.last_name}
-      bind:error={inputErrors.last_name} />
+    {#if $form.errors.last_name}
+      <FormInput
+        type="text"
+        label="last name"
+        placeholder="Doe"
+        error={true}
+        bind:value={$form.last_name} />
+    {:else}
+      <FormInput
+        type="text"
+        label="last name"
+        placeholder="Doe"
+        bind:value={$form.last_name} />
+    {/if}
   </InputGroup>
   <!-- input group 2 -->
   <InputGroup>
     <!-- email input -->
-    <FormInput
-      type="text"
-      label="email address"
-      placeholder="john.doe@mail.com"
-      bind:value={formData.email}
-      bind:error={inputErrors.email} />
-    <!-- unique field -->
-    {#if formData.type === 'TUTOR'}
+    {#if $form.errors.email}
       <FormInput
         type="text"
-        label="CPF"
-        placeholder="000.000.000-00"
-        bind:value={formData.tutor_cpf}
-        bind:error={inputErrors.tutor_cpf} />
+        label="email address"
+        placeholder="john.doe@mail.com"
+        error={true}
+        bind:value={$form.email} />
+    {:else}
+      <FormInput
+        type="text"
+        label="email address"
+        placeholder="john.doe@mail.com"
+        bind:value={$form.email} />
+    {/if}
+
+    <!-- unique field -->
+    {#if $form.type === 'TUTOR'}
+      {#if $form.errors.tutor_cpf}
+        <FormInput
+          type="text"
+          label="CPF"
+          placeholder="000.000.000-00"
+          error={true}
+          bind:value={$form.tutor_cpf} />
+      {:else}
+        <FormInput
+          type="text"
+          label="CPF"
+          placeholder="000.000.000-00"
+          bind:value={$form.tutor_cpf} />
+      {/if}
+    {:else if $form.errors.vet_crmv}
+      <FormInput
+        type="text"
+        label="CRMV"
+        placeholder="0000-00"
+        error={true}
+        bind:value={$form.vet_crmv} />
     {:else}
       <FormInput
         type="text"
         label="CRMV"
         placeholder="0000-00"
-        bind:value={formData.vet_crmv}
-        bind:error={inputErrors.vet_crmv} />
+        bind:value={$form.vet_crmv} />
     {/if}
   </InputGroup>
   <!-- input group 3 -->
   <InputGroup>
     <!-- password input -->
-    <FormInput
-      type="password"
-      label="password"
-      placeholder="******"
-      bind:value={formData.password}
-      bind:error={inputErrors.password} />
+    {#if $form.errors.password}
+      <FormInput
+        type="password"
+        label="password"
+        placeholder="******"
+        error={true}
+        bind:value={$form.password} />
+    {:else}
+      <FormInput
+        type="password"
+        label="password"
+        placeholder="******"
+        bind:value={$form.password} />
+    {/if}
     <!-- confirm password input -->
     <FormInput
       type="password"
       label="confirm password"
       placeholder="******"
-      bind:value={formData.password_confirmation}
-      bind:error={inputErrors.password_confirmation} />
+      bind:value={$form.password_confirmation} />
   </InputGroup>
-  <!-- input group 4 -->
   <div class="flex flex-col gap-y-4">
+    <!-- input group 4 -->
     <InputGroup>
       <FormInputSelect
         label="who Am I?"
         options={inputOptions}
-        bind:value={formData.type} />
+        bind:value={$form.type} />
     </InputGroup>
-    <!-- error output -->
-    <FormAlert bind:open={errorOpen} bind:text={errorMessage} />
     <!-- submit button -->
-    <Button text="Sign up" type="submit" />
+    <Button text="Sign up" type="submit" disabled={$form.processing} />
+    <!-- error output -->
+    {#if $form.hasErrors}
+      <FormAlert open={true} text={handleFormErrorMessage($form.errors)} />
+    {/if}
   </div>
 </Form>
 

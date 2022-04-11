@@ -2539,2161 +2539,6 @@ var n,e=(n=__webpack_require__(/*! nprogress */ "./node_modules/nprogress/nprogr
 
 /***/ }),
 
-/***/ "./node_modules/axios/index.js":
-/*!*************************************!*\
-  !*** ./node_modules/axios/index.js ***!
-  \*************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-module.exports = __webpack_require__(/*! ./lib/axios */ "./node_modules/axios/lib/axios.js");
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/adapters/xhr.js":
-/*!************************************************!*\
-  !*** ./node_modules/axios/lib/adapters/xhr.js ***!
-  \************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-var settle = __webpack_require__(/*! ./../core/settle */ "./node_modules/axios/lib/core/settle.js");
-var cookies = __webpack_require__(/*! ./../helpers/cookies */ "./node_modules/axios/lib/helpers/cookies.js");
-var buildURL = __webpack_require__(/*! ./../helpers/buildURL */ "./node_modules/axios/lib/helpers/buildURL.js");
-var buildFullPath = __webpack_require__(/*! ../core/buildFullPath */ "./node_modules/axios/lib/core/buildFullPath.js");
-var parseHeaders = __webpack_require__(/*! ./../helpers/parseHeaders */ "./node_modules/axios/lib/helpers/parseHeaders.js");
-var isURLSameOrigin = __webpack_require__(/*! ./../helpers/isURLSameOrigin */ "./node_modules/axios/lib/helpers/isURLSameOrigin.js");
-var createError = __webpack_require__(/*! ../core/createError */ "./node_modules/axios/lib/core/createError.js");
-var defaults = __webpack_require__(/*! ../defaults */ "./node_modules/axios/lib/defaults.js");
-var Cancel = __webpack_require__(/*! ../cancel/Cancel */ "./node_modules/axios/lib/cancel/Cancel.js");
-
-module.exports = function xhrAdapter(config) {
-  return new Promise(function dispatchXhrRequest(resolve, reject) {
-    var requestData = config.data;
-    var requestHeaders = config.headers;
-    var responseType = config.responseType;
-    var onCanceled;
-    function done() {
-      if (config.cancelToken) {
-        config.cancelToken.unsubscribe(onCanceled);
-      }
-
-      if (config.signal) {
-        config.signal.removeEventListener('abort', onCanceled);
-      }
-    }
-
-    if (utils.isFormData(requestData)) {
-      delete requestHeaders['Content-Type']; // Let the browser set it
-    }
-
-    var request = new XMLHttpRequest();
-
-    // HTTP basic authentication
-    if (config.auth) {
-      var username = config.auth.username || '';
-      var password = config.auth.password ? unescape(encodeURIComponent(config.auth.password)) : '';
-      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
-    }
-
-    var fullPath = buildFullPath(config.baseURL, config.url);
-    request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
-
-    // Set the request timeout in MS
-    request.timeout = config.timeout;
-
-    function onloadend() {
-      if (!request) {
-        return;
-      }
-      // Prepare the response
-      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-      var responseData = !responseType || responseType === 'text' ||  responseType === 'json' ?
-        request.responseText : request.response;
-      var response = {
-        data: responseData,
-        status: request.status,
-        statusText: request.statusText,
-        headers: responseHeaders,
-        config: config,
-        request: request
-      };
-
-      settle(function _resolve(value) {
-        resolve(value);
-        done();
-      }, function _reject(err) {
-        reject(err);
-        done();
-      }, response);
-
-      // Clean up request
-      request = null;
-    }
-
-    if ('onloadend' in request) {
-      // Use onloadend if available
-      request.onloadend = onloadend;
-    } else {
-      // Listen for ready state to emulate onloadend
-      request.onreadystatechange = function handleLoad() {
-        if (!request || request.readyState !== 4) {
-          return;
-        }
-
-        // The request errored out and we didn't get a response, this will be
-        // handled by onerror instead
-        // With one exception: request that using file: protocol, most browsers
-        // will return status as 0 even though it's a successful request
-        if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-          return;
-        }
-        // readystate handler is calling before onerror or ontimeout handlers,
-        // so we should call onloadend on the next 'tick'
-        setTimeout(onloadend);
-      };
-    }
-
-    // Handle browser request cancellation (as opposed to a manual cancellation)
-    request.onabort = function handleAbort() {
-      if (!request) {
-        return;
-      }
-
-      reject(createError('Request aborted', config, 'ECONNABORTED', request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle low level network errors
-    request.onerror = function handleError() {
-      // Real errors are hidden from us by the browser
-      // onerror should only fire if it's a network error
-      reject(createError('Network Error', config, null, request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle timeout
-    request.ontimeout = function handleTimeout() {
-      var timeoutErrorMessage = config.timeout ? 'timeout of ' + config.timeout + 'ms exceeded' : 'timeout exceeded';
-      var transitional = config.transitional || defaults.transitional;
-      if (config.timeoutErrorMessage) {
-        timeoutErrorMessage = config.timeoutErrorMessage;
-      }
-      reject(createError(
-        timeoutErrorMessage,
-        config,
-        transitional.clarifyTimeoutError ? 'ETIMEDOUT' : 'ECONNABORTED',
-        request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Add xsrf header
-    // This is only done if running in a standard browser environment.
-    // Specifically not if we're in a web worker, or react-native.
-    if (utils.isStandardBrowserEnv()) {
-      // Add xsrf header
-      var xsrfValue = (config.withCredentials || isURLSameOrigin(fullPath)) && config.xsrfCookieName ?
-        cookies.read(config.xsrfCookieName) :
-        undefined;
-
-      if (xsrfValue) {
-        requestHeaders[config.xsrfHeaderName] = xsrfValue;
-      }
-    }
-
-    // Add headers to the request
-    if ('setRequestHeader' in request) {
-      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
-        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
-          // Remove Content-Type if data is undefined
-          delete requestHeaders[key];
-        } else {
-          // Otherwise add header to the request
-          request.setRequestHeader(key, val);
-        }
-      });
-    }
-
-    // Add withCredentials to request if needed
-    if (!utils.isUndefined(config.withCredentials)) {
-      request.withCredentials = !!config.withCredentials;
-    }
-
-    // Add responseType to request if needed
-    if (responseType && responseType !== 'json') {
-      request.responseType = config.responseType;
-    }
-
-    // Handle progress if needed
-    if (typeof config.onDownloadProgress === 'function') {
-      request.addEventListener('progress', config.onDownloadProgress);
-    }
-
-    // Not all browsers support upload events
-    if (typeof config.onUploadProgress === 'function' && request.upload) {
-      request.upload.addEventListener('progress', config.onUploadProgress);
-    }
-
-    if (config.cancelToken || config.signal) {
-      // Handle cancellation
-      // eslint-disable-next-line func-names
-      onCanceled = function(cancel) {
-        if (!request) {
-          return;
-        }
-        reject(!cancel || (cancel && cancel.type) ? new Cancel('canceled') : cancel);
-        request.abort();
-        request = null;
-      };
-
-      config.cancelToken && config.cancelToken.subscribe(onCanceled);
-      if (config.signal) {
-        config.signal.aborted ? onCanceled() : config.signal.addEventListener('abort', onCanceled);
-      }
-    }
-
-    if (!requestData) {
-      requestData = null;
-    }
-
-    // Send the request
-    request.send(requestData);
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/axios.js":
-/*!*****************************************!*\
-  !*** ./node_modules/axios/lib/axios.js ***!
-  \*****************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./utils */ "./node_modules/axios/lib/utils.js");
-var bind = __webpack_require__(/*! ./helpers/bind */ "./node_modules/axios/lib/helpers/bind.js");
-var Axios = __webpack_require__(/*! ./core/Axios */ "./node_modules/axios/lib/core/Axios.js");
-var mergeConfig = __webpack_require__(/*! ./core/mergeConfig */ "./node_modules/axios/lib/core/mergeConfig.js");
-var defaults = __webpack_require__(/*! ./defaults */ "./node_modules/axios/lib/defaults.js");
-
-/**
- * Create an instance of Axios
- *
- * @param {Object} defaultConfig The default config for the instance
- * @return {Axios} A new instance of Axios
- */
-function createInstance(defaultConfig) {
-  var context = new Axios(defaultConfig);
-  var instance = bind(Axios.prototype.request, context);
-
-  // Copy axios.prototype to instance
-  utils.extend(instance, Axios.prototype, context);
-
-  // Copy context to instance
-  utils.extend(instance, context);
-
-  // Factory for creating new instances
-  instance.create = function create(instanceConfig) {
-    return createInstance(mergeConfig(defaultConfig, instanceConfig));
-  };
-
-  return instance;
-}
-
-// Create the default instance to be exported
-var axios = createInstance(defaults);
-
-// Expose Axios class to allow class inheritance
-axios.Axios = Axios;
-
-// Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(/*! ./cancel/Cancel */ "./node_modules/axios/lib/cancel/Cancel.js");
-axios.CancelToken = __webpack_require__(/*! ./cancel/CancelToken */ "./node_modules/axios/lib/cancel/CancelToken.js");
-axios.isCancel = __webpack_require__(/*! ./cancel/isCancel */ "./node_modules/axios/lib/cancel/isCancel.js");
-axios.VERSION = (__webpack_require__(/*! ./env/data */ "./node_modules/axios/lib/env/data.js").version);
-
-// Expose all/spread
-axios.all = function all(promises) {
-  return Promise.all(promises);
-};
-axios.spread = __webpack_require__(/*! ./helpers/spread */ "./node_modules/axios/lib/helpers/spread.js");
-
-// Expose isAxiosError
-axios.isAxiosError = __webpack_require__(/*! ./helpers/isAxiosError */ "./node_modules/axios/lib/helpers/isAxiosError.js");
-
-module.exports = axios;
-
-// Allow use of default import syntax in TypeScript
-module.exports["default"] = axios;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/cancel/Cancel.js":
-/*!*************************************************!*\
-  !*** ./node_modules/axios/lib/cancel/Cancel.js ***!
-  \*************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * A `Cancel` is an object that is thrown when an operation is canceled.
- *
- * @class
- * @param {string=} message The message.
- */
-function Cancel(message) {
-  this.message = message;
-}
-
-Cancel.prototype.toString = function toString() {
-  return 'Cancel' + (this.message ? ': ' + this.message : '');
-};
-
-Cancel.prototype.__CANCEL__ = true;
-
-module.exports = Cancel;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/cancel/CancelToken.js":
-/*!******************************************************!*\
-  !*** ./node_modules/axios/lib/cancel/CancelToken.js ***!
-  \******************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var Cancel = __webpack_require__(/*! ./Cancel */ "./node_modules/axios/lib/cancel/Cancel.js");
-
-/**
- * A `CancelToken` is an object that can be used to request cancellation of an operation.
- *
- * @class
- * @param {Function} executor The executor function.
- */
-function CancelToken(executor) {
-  if (typeof executor !== 'function') {
-    throw new TypeError('executor must be a function.');
-  }
-
-  var resolvePromise;
-
-  this.promise = new Promise(function promiseExecutor(resolve) {
-    resolvePromise = resolve;
-  });
-
-  var token = this;
-
-  // eslint-disable-next-line func-names
-  this.promise.then(function(cancel) {
-    if (!token._listeners) return;
-
-    var i;
-    var l = token._listeners.length;
-
-    for (i = 0; i < l; i++) {
-      token._listeners[i](cancel);
-    }
-    token._listeners = null;
-  });
-
-  // eslint-disable-next-line func-names
-  this.promise.then = function(onfulfilled) {
-    var _resolve;
-    // eslint-disable-next-line func-names
-    var promise = new Promise(function(resolve) {
-      token.subscribe(resolve);
-      _resolve = resolve;
-    }).then(onfulfilled);
-
-    promise.cancel = function reject() {
-      token.unsubscribe(_resolve);
-    };
-
-    return promise;
-  };
-
-  executor(function cancel(message) {
-    if (token.reason) {
-      // Cancellation has already been requested
-      return;
-    }
-
-    token.reason = new Cancel(message);
-    resolvePromise(token.reason);
-  });
-}
-
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
-CancelToken.prototype.throwIfRequested = function throwIfRequested() {
-  if (this.reason) {
-    throw this.reason;
-  }
-};
-
-/**
- * Subscribe to the cancel signal
- */
-
-CancelToken.prototype.subscribe = function subscribe(listener) {
-  if (this.reason) {
-    listener(this.reason);
-    return;
-  }
-
-  if (this._listeners) {
-    this._listeners.push(listener);
-  } else {
-    this._listeners = [listener];
-  }
-};
-
-/**
- * Unsubscribe from the cancel signal
- */
-
-CancelToken.prototype.unsubscribe = function unsubscribe(listener) {
-  if (!this._listeners) {
-    return;
-  }
-  var index = this._listeners.indexOf(listener);
-  if (index !== -1) {
-    this._listeners.splice(index, 1);
-  }
-};
-
-/**
- * Returns an object that contains a new `CancelToken` and a function that, when called,
- * cancels the `CancelToken`.
- */
-CancelToken.source = function source() {
-  var cancel;
-  var token = new CancelToken(function executor(c) {
-    cancel = c;
-  });
-  return {
-    token: token,
-    cancel: cancel
-  };
-};
-
-module.exports = CancelToken;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/cancel/isCancel.js":
-/*!***************************************************!*\
-  !*** ./node_modules/axios/lib/cancel/isCancel.js ***!
-  \***************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-module.exports = function isCancel(value) {
-  return !!(value && value.__CANCEL__);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/Axios.js":
-/*!**********************************************!*\
-  !*** ./node_modules/axios/lib/core/Axios.js ***!
-  \**********************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-var buildURL = __webpack_require__(/*! ../helpers/buildURL */ "./node_modules/axios/lib/helpers/buildURL.js");
-var InterceptorManager = __webpack_require__(/*! ./InterceptorManager */ "./node_modules/axios/lib/core/InterceptorManager.js");
-var dispatchRequest = __webpack_require__(/*! ./dispatchRequest */ "./node_modules/axios/lib/core/dispatchRequest.js");
-var mergeConfig = __webpack_require__(/*! ./mergeConfig */ "./node_modules/axios/lib/core/mergeConfig.js");
-var validator = __webpack_require__(/*! ../helpers/validator */ "./node_modules/axios/lib/helpers/validator.js");
-
-var validators = validator.validators;
-/**
- * Create a new instance of Axios
- *
- * @param {Object} instanceConfig The default config for the instance
- */
-function Axios(instanceConfig) {
-  this.defaults = instanceConfig;
-  this.interceptors = {
-    request: new InterceptorManager(),
-    response: new InterceptorManager()
-  };
-}
-
-/**
- * Dispatch a request
- *
- * @param {Object} config The config specific for this request (merged with this.defaults)
- */
-Axios.prototype.request = function request(configOrUrl, config) {
-  /*eslint no-param-reassign:0*/
-  // Allow for axios('example/url'[, config]) a la fetch API
-  if (typeof configOrUrl === 'string') {
-    config = config || {};
-    config.url = configOrUrl;
-  } else {
-    config = configOrUrl || {};
-  }
-
-  if (!config.url) {
-    throw new Error('Provided config url is not valid');
-  }
-
-  config = mergeConfig(this.defaults, config);
-
-  // Set config.method
-  if (config.method) {
-    config.method = config.method.toLowerCase();
-  } else if (this.defaults.method) {
-    config.method = this.defaults.method.toLowerCase();
-  } else {
-    config.method = 'get';
-  }
-
-  var transitional = config.transitional;
-
-  if (transitional !== undefined) {
-    validator.assertOptions(transitional, {
-      silentJSONParsing: validators.transitional(validators.boolean),
-      forcedJSONParsing: validators.transitional(validators.boolean),
-      clarifyTimeoutError: validators.transitional(validators.boolean)
-    }, false);
-  }
-
-  // filter out skipped interceptors
-  var requestInterceptorChain = [];
-  var synchronousRequestInterceptors = true;
-  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
-    if (typeof interceptor.runWhen === 'function' && interceptor.runWhen(config) === false) {
-      return;
-    }
-
-    synchronousRequestInterceptors = synchronousRequestInterceptors && interceptor.synchronous;
-
-    requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
-  });
-
-  var responseInterceptorChain = [];
-  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
-    responseInterceptorChain.push(interceptor.fulfilled, interceptor.rejected);
-  });
-
-  var promise;
-
-  if (!synchronousRequestInterceptors) {
-    var chain = [dispatchRequest, undefined];
-
-    Array.prototype.unshift.apply(chain, requestInterceptorChain);
-    chain = chain.concat(responseInterceptorChain);
-
-    promise = Promise.resolve(config);
-    while (chain.length) {
-      promise = promise.then(chain.shift(), chain.shift());
-    }
-
-    return promise;
-  }
-
-
-  var newConfig = config;
-  while (requestInterceptorChain.length) {
-    var onFulfilled = requestInterceptorChain.shift();
-    var onRejected = requestInterceptorChain.shift();
-    try {
-      newConfig = onFulfilled(newConfig);
-    } catch (error) {
-      onRejected(error);
-      break;
-    }
-  }
-
-  try {
-    promise = dispatchRequest(newConfig);
-  } catch (error) {
-    return Promise.reject(error);
-  }
-
-  while (responseInterceptorChain.length) {
-    promise = promise.then(responseInterceptorChain.shift(), responseInterceptorChain.shift());
-  }
-
-  return promise;
-};
-
-Axios.prototype.getUri = function getUri(config) {
-  if (!config.url) {
-    throw new Error('Provided config url is not valid');
-  }
-  config = mergeConfig(this.defaults, config);
-  return buildURL(config.url, config.params, config.paramsSerializer).replace(/^\?/, '');
-};
-
-// Provide aliases for supported request methods
-utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
-  /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, config) {
-    return this.request(mergeConfig(config || {}, {
-      method: method,
-      url: url,
-      data: (config || {}).data
-    }));
-  };
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, data, config) {
-    return this.request(mergeConfig(config || {}, {
-      method: method,
-      url: url,
-      data: data
-    }));
-  };
-});
-
-module.exports = Axios;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/InterceptorManager.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/axios/lib/core/InterceptorManager.js ***!
-  \***********************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-
-function InterceptorManager() {
-  this.handlers = [];
-}
-
-/**
- * Add a new interceptor to the stack
- *
- * @param {Function} fulfilled The function to handle `then` for a `Promise`
- * @param {Function} rejected The function to handle `reject` for a `Promise`
- *
- * @return {Number} An ID used to remove interceptor later
- */
-InterceptorManager.prototype.use = function use(fulfilled, rejected, options) {
-  this.handlers.push({
-    fulfilled: fulfilled,
-    rejected: rejected,
-    synchronous: options ? options.synchronous : false,
-    runWhen: options ? options.runWhen : null
-  });
-  return this.handlers.length - 1;
-};
-
-/**
- * Remove an interceptor from the stack
- *
- * @param {Number} id The ID that was returned by `use`
- */
-InterceptorManager.prototype.eject = function eject(id) {
-  if (this.handlers[id]) {
-    this.handlers[id] = null;
-  }
-};
-
-/**
- * Iterate over all the registered interceptors
- *
- * This method is particularly useful for skipping over any
- * interceptors that may have become `null` calling `eject`.
- *
- * @param {Function} fn The function to call for each interceptor
- */
-InterceptorManager.prototype.forEach = function forEach(fn) {
-  utils.forEach(this.handlers, function forEachHandler(h) {
-    if (h !== null) {
-      fn(h);
-    }
-  });
-};
-
-module.exports = InterceptorManager;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/buildFullPath.js":
-/*!******************************************************!*\
-  !*** ./node_modules/axios/lib/core/buildFullPath.js ***!
-  \******************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var isAbsoluteURL = __webpack_require__(/*! ../helpers/isAbsoluteURL */ "./node_modules/axios/lib/helpers/isAbsoluteURL.js");
-var combineURLs = __webpack_require__(/*! ../helpers/combineURLs */ "./node_modules/axios/lib/helpers/combineURLs.js");
-
-/**
- * Creates a new URL by combining the baseURL with the requestedURL,
- * only when the requestedURL is not already an absolute URL.
- * If the requestURL is absolute, this function returns the requestedURL untouched.
- *
- * @param {string} baseURL The base URL
- * @param {string} requestedURL Absolute or relative URL to combine
- * @returns {string} The combined full path
- */
-module.exports = function buildFullPath(baseURL, requestedURL) {
-  if (baseURL && !isAbsoluteURL(requestedURL)) {
-    return combineURLs(baseURL, requestedURL);
-  }
-  return requestedURL;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/createError.js":
-/*!****************************************************!*\
-  !*** ./node_modules/axios/lib/core/createError.js ***!
-  \****************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var enhanceError = __webpack_require__(/*! ./enhanceError */ "./node_modules/axios/lib/core/enhanceError.js");
-
-/**
- * Create an Error with the specified message, config, error code, request and response.
- *
- * @param {string} message The error message.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- * @returns {Error} The created error.
- */
-module.exports = function createError(message, config, code, request, response) {
-  var error = new Error(message);
-  return enhanceError(error, config, code, request, response);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/dispatchRequest.js":
-/*!********************************************************!*\
-  !*** ./node_modules/axios/lib/core/dispatchRequest.js ***!
-  \********************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-var transformData = __webpack_require__(/*! ./transformData */ "./node_modules/axios/lib/core/transformData.js");
-var isCancel = __webpack_require__(/*! ../cancel/isCancel */ "./node_modules/axios/lib/cancel/isCancel.js");
-var defaults = __webpack_require__(/*! ../defaults */ "./node_modules/axios/lib/defaults.js");
-var Cancel = __webpack_require__(/*! ../cancel/Cancel */ "./node_modules/axios/lib/cancel/Cancel.js");
-
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
-function throwIfCancellationRequested(config) {
-  if (config.cancelToken) {
-    config.cancelToken.throwIfRequested();
-  }
-
-  if (config.signal && config.signal.aborted) {
-    throw new Cancel('canceled');
-  }
-}
-
-/**
- * Dispatch a request to the server using the configured adapter.
- *
- * @param {object} config The config that is to be used for the request
- * @returns {Promise} The Promise to be fulfilled
- */
-module.exports = function dispatchRequest(config) {
-  throwIfCancellationRequested(config);
-
-  // Ensure headers exist
-  config.headers = config.headers || {};
-
-  // Transform request data
-  config.data = transformData.call(
-    config,
-    config.data,
-    config.headers,
-    config.transformRequest
-  );
-
-  // Flatten headers
-  config.headers = utils.merge(
-    config.headers.common || {},
-    config.headers[config.method] || {},
-    config.headers
-  );
-
-  utils.forEach(
-    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
-    function cleanHeaderConfig(method) {
-      delete config.headers[method];
-    }
-  );
-
-  var adapter = config.adapter || defaults.adapter;
-
-  return adapter(config).then(function onAdapterResolution(response) {
-    throwIfCancellationRequested(config);
-
-    // Transform response data
-    response.data = transformData.call(
-      config,
-      response.data,
-      response.headers,
-      config.transformResponse
-    );
-
-    return response;
-  }, function onAdapterRejection(reason) {
-    if (!isCancel(reason)) {
-      throwIfCancellationRequested(config);
-
-      // Transform response data
-      if (reason && reason.response) {
-        reason.response.data = transformData.call(
-          config,
-          reason.response.data,
-          reason.response.headers,
-          config.transformResponse
-        );
-      }
-    }
-
-    return Promise.reject(reason);
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/enhanceError.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/axios/lib/core/enhanceError.js ***!
-  \*****************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * Update an Error with the specified config, error code, and response.
- *
- * @param {Error} error The error to update.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- * @returns {Error} The error.
- */
-module.exports = function enhanceError(error, config, code, request, response) {
-  error.config = config;
-  if (code) {
-    error.code = code;
-  }
-
-  error.request = request;
-  error.response = response;
-  error.isAxiosError = true;
-
-  error.toJSON = function toJSON() {
-    return {
-      // Standard
-      message: this.message,
-      name: this.name,
-      // Microsoft
-      description: this.description,
-      number: this.number,
-      // Mozilla
-      fileName: this.fileName,
-      lineNumber: this.lineNumber,
-      columnNumber: this.columnNumber,
-      stack: this.stack,
-      // Axios
-      config: this.config,
-      code: this.code,
-      status: this.response && this.response.status ? this.response.status : null
-    };
-  };
-  return error;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/mergeConfig.js":
-/*!****************************************************!*\
-  !*** ./node_modules/axios/lib/core/mergeConfig.js ***!
-  \****************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ../utils */ "./node_modules/axios/lib/utils.js");
-
-/**
- * Config-specific merge-function which creates a new config-object
- * by merging two configuration objects together.
- *
- * @param {Object} config1
- * @param {Object} config2
- * @returns {Object} New object resulting from merging config2 to config1
- */
-module.exports = function mergeConfig(config1, config2) {
-  // eslint-disable-next-line no-param-reassign
-  config2 = config2 || {};
-  var config = {};
-
-  function getMergedValue(target, source) {
-    if (utils.isPlainObject(target) && utils.isPlainObject(source)) {
-      return utils.merge(target, source);
-    } else if (utils.isPlainObject(source)) {
-      return utils.merge({}, source);
-    } else if (utils.isArray(source)) {
-      return source.slice();
-    }
-    return source;
-  }
-
-  // eslint-disable-next-line consistent-return
-  function mergeDeepProperties(prop) {
-    if (!utils.isUndefined(config2[prop])) {
-      return getMergedValue(config1[prop], config2[prop]);
-    } else if (!utils.isUndefined(config1[prop])) {
-      return getMergedValue(undefined, config1[prop]);
-    }
-  }
-
-  // eslint-disable-next-line consistent-return
-  function valueFromConfig2(prop) {
-    if (!utils.isUndefined(config2[prop])) {
-      return getMergedValue(undefined, config2[prop]);
-    }
-  }
-
-  // eslint-disable-next-line consistent-return
-  function defaultToConfig2(prop) {
-    if (!utils.isUndefined(config2[prop])) {
-      return getMergedValue(undefined, config2[prop]);
-    } else if (!utils.isUndefined(config1[prop])) {
-      return getMergedValue(undefined, config1[prop]);
-    }
-  }
-
-  // eslint-disable-next-line consistent-return
-  function mergeDirectKeys(prop) {
-    if (prop in config2) {
-      return getMergedValue(config1[prop], config2[prop]);
-    } else if (prop in config1) {
-      return getMergedValue(undefined, config1[prop]);
-    }
-  }
-
-  var mergeMap = {
-    'url': valueFromConfig2,
-    'method': valueFromConfig2,
-    'data': valueFromConfig2,
-    'baseURL': defaultToConfig2,
-    'transformRequest': defaultToConfig2,
-    'transformResponse': defaultToConfig2,
-    'paramsSerializer': defaultToConfig2,
-    'timeout': defaultToConfig2,
-    'timeoutMessage': defaultToConfig2,
-    'withCredentials': defaultToConfig2,
-    'adapter': defaultToConfig2,
-    'responseType': defaultToConfig2,
-    'xsrfCookieName': defaultToConfig2,
-    'xsrfHeaderName': defaultToConfig2,
-    'onUploadProgress': defaultToConfig2,
-    'onDownloadProgress': defaultToConfig2,
-    'decompress': defaultToConfig2,
-    'maxContentLength': defaultToConfig2,
-    'maxBodyLength': defaultToConfig2,
-    'transport': defaultToConfig2,
-    'httpAgent': defaultToConfig2,
-    'httpsAgent': defaultToConfig2,
-    'cancelToken': defaultToConfig2,
-    'socketPath': defaultToConfig2,
-    'responseEncoding': defaultToConfig2,
-    'validateStatus': mergeDirectKeys
-  };
-
-  utils.forEach(Object.keys(config1).concat(Object.keys(config2)), function computeConfigValue(prop) {
-    var merge = mergeMap[prop] || mergeDeepProperties;
-    var configValue = merge(prop);
-    (utils.isUndefined(configValue) && merge !== mergeDirectKeys) || (config[prop] = configValue);
-  });
-
-  return config;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/settle.js":
-/*!***********************************************!*\
-  !*** ./node_modules/axios/lib/core/settle.js ***!
-  \***********************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var createError = __webpack_require__(/*! ./createError */ "./node_modules/axios/lib/core/createError.js");
-
-/**
- * Resolve or reject a Promise based on response status.
- *
- * @param {Function} resolve A function that resolves the promise.
- * @param {Function} reject A function that rejects the promise.
- * @param {object} response The response.
- */
-module.exports = function settle(resolve, reject, response) {
-  var validateStatus = response.config.validateStatus;
-  if (!response.status || !validateStatus || validateStatus(response.status)) {
-    resolve(response);
-  } else {
-    reject(createError(
-      'Request failed with status code ' + response.status,
-      response.config,
-      null,
-      response.request,
-      response
-    ));
-  }
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/core/transformData.js":
-/*!******************************************************!*\
-  !*** ./node_modules/axios/lib/core/transformData.js ***!
-  \******************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-var defaults = __webpack_require__(/*! ./../defaults */ "./node_modules/axios/lib/defaults.js");
-
-/**
- * Transform the data for a request or a response
- *
- * @param {Object|String} data The data to be transformed
- * @param {Array} headers The headers for the request or response
- * @param {Array|Function} fns A single function or Array of functions
- * @returns {*} The resulting transformed data
- */
-module.exports = function transformData(data, headers, fns) {
-  var context = this || defaults;
-  /*eslint no-param-reassign:0*/
-  utils.forEach(fns, function transform(fn) {
-    data = fn.call(context, data, headers);
-  });
-
-  return data;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/defaults.js":
-/*!********************************************!*\
-  !*** ./node_modules/axios/lib/defaults.js ***!
-  \********************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-/* provided dependency */ var process = __webpack_require__(/*! process/browser.js */ "./node_modules/process/browser.js");
-
-
-var utils = __webpack_require__(/*! ./utils */ "./node_modules/axios/lib/utils.js");
-var normalizeHeaderName = __webpack_require__(/*! ./helpers/normalizeHeaderName */ "./node_modules/axios/lib/helpers/normalizeHeaderName.js");
-var enhanceError = __webpack_require__(/*! ./core/enhanceError */ "./node_modules/axios/lib/core/enhanceError.js");
-
-var DEFAULT_CONTENT_TYPE = {
-  'Content-Type': 'application/x-www-form-urlencoded'
-};
-
-function setContentTypeIfUnset(headers, value) {
-  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
-    headers['Content-Type'] = value;
-  }
-}
-
-function getDefaultAdapter() {
-  var adapter;
-  if (typeof XMLHttpRequest !== 'undefined') {
-    // For browsers use XHR adapter
-    adapter = __webpack_require__(/*! ./adapters/xhr */ "./node_modules/axios/lib/adapters/xhr.js");
-  } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
-    // For node use HTTP adapter
-    adapter = __webpack_require__(/*! ./adapters/http */ "./node_modules/axios/lib/adapters/xhr.js");
-  }
-  return adapter;
-}
-
-function stringifySafely(rawValue, parser, encoder) {
-  if (utils.isString(rawValue)) {
-    try {
-      (parser || JSON.parse)(rawValue);
-      return utils.trim(rawValue);
-    } catch (e) {
-      if (e.name !== 'SyntaxError') {
-        throw e;
-      }
-    }
-  }
-
-  return (encoder || JSON.stringify)(rawValue);
-}
-
-var defaults = {
-
-  transitional: {
-    silentJSONParsing: true,
-    forcedJSONParsing: true,
-    clarifyTimeoutError: false
-  },
-
-  adapter: getDefaultAdapter(),
-
-  transformRequest: [function transformRequest(data, headers) {
-    normalizeHeaderName(headers, 'Accept');
-    normalizeHeaderName(headers, 'Content-Type');
-
-    if (utils.isFormData(data) ||
-      utils.isArrayBuffer(data) ||
-      utils.isBuffer(data) ||
-      utils.isStream(data) ||
-      utils.isFile(data) ||
-      utils.isBlob(data)
-    ) {
-      return data;
-    }
-    if (utils.isArrayBufferView(data)) {
-      return data.buffer;
-    }
-    if (utils.isURLSearchParams(data)) {
-      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
-      return data.toString();
-    }
-    if (utils.isObject(data) || (headers && headers['Content-Type'] === 'application/json')) {
-      setContentTypeIfUnset(headers, 'application/json');
-      return stringifySafely(data);
-    }
-    return data;
-  }],
-
-  transformResponse: [function transformResponse(data) {
-    var transitional = this.transitional || defaults.transitional;
-    var silentJSONParsing = transitional && transitional.silentJSONParsing;
-    var forcedJSONParsing = transitional && transitional.forcedJSONParsing;
-    var strictJSONParsing = !silentJSONParsing && this.responseType === 'json';
-
-    if (strictJSONParsing || (forcedJSONParsing && utils.isString(data) && data.length)) {
-      try {
-        return JSON.parse(data);
-      } catch (e) {
-        if (strictJSONParsing) {
-          if (e.name === 'SyntaxError') {
-            throw enhanceError(e, this, 'E_JSON_PARSE');
-          }
-          throw e;
-        }
-      }
-    }
-
-    return data;
-  }],
-
-  /**
-   * A timeout in milliseconds to abort a request. If set to 0 (default) a
-   * timeout is not created.
-   */
-  timeout: 0,
-
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-
-  maxContentLength: -1,
-  maxBodyLength: -1,
-
-  validateStatus: function validateStatus(status) {
-    return status >= 200 && status < 300;
-  },
-
-  headers: {
-    common: {
-      'Accept': 'application/json, text/plain, */*'
-    }
-  }
-};
-
-utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
-  defaults.headers[method] = {};
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
-});
-
-module.exports = defaults;
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/env/data.js":
-/*!********************************************!*\
-  !*** ./node_modules/axios/lib/env/data.js ***!
-  \********************************************/
-/***/ ((module) => {
-
-module.exports = {
-  "version": "0.25.0"
-};
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/bind.js":
-/*!************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/bind.js ***!
-  \************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-module.exports = function bind(fn, thisArg) {
-  return function wrap() {
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-    return fn.apply(thisArg, args);
-  };
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/buildURL.js":
-/*!****************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/buildURL.js ***!
-  \****************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-
-function encode(val) {
-  return encodeURIComponent(val).
-    replace(/%3A/gi, ':').
-    replace(/%24/g, '$').
-    replace(/%2C/gi, ',').
-    replace(/%20/g, '+').
-    replace(/%5B/gi, '[').
-    replace(/%5D/gi, ']');
-}
-
-/**
- * Build a URL by appending params to the end
- *
- * @param {string} url The base of the url (e.g., http://www.google.com)
- * @param {object} [params] The params to be appended
- * @returns {string} The formatted url
- */
-module.exports = function buildURL(url, params, paramsSerializer) {
-  /*eslint no-param-reassign:0*/
-  if (!params) {
-    return url;
-  }
-
-  var serializedParams;
-  if (paramsSerializer) {
-    serializedParams = paramsSerializer(params);
-  } else if (utils.isURLSearchParams(params)) {
-    serializedParams = params.toString();
-  } else {
-    var parts = [];
-
-    utils.forEach(params, function serialize(val, key) {
-      if (val === null || typeof val === 'undefined') {
-        return;
-      }
-
-      if (utils.isArray(val)) {
-        key = key + '[]';
-      } else {
-        val = [val];
-      }
-
-      utils.forEach(val, function parseValue(v) {
-        if (utils.isDate(v)) {
-          v = v.toISOString();
-        } else if (utils.isObject(v)) {
-          v = JSON.stringify(v);
-        }
-        parts.push(encode(key) + '=' + encode(v));
-      });
-    });
-
-    serializedParams = parts.join('&');
-  }
-
-  if (serializedParams) {
-    var hashmarkIndex = url.indexOf('#');
-    if (hashmarkIndex !== -1) {
-      url = url.slice(0, hashmarkIndex);
-    }
-
-    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
-  }
-
-  return url;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/combineURLs.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/combineURLs.js ***!
-  \*******************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * Creates a new URL by combining the specified URLs
- *
- * @param {string} baseURL The base URL
- * @param {string} relativeURL The relative URL
- * @returns {string} The combined URL
- */
-module.exports = function combineURLs(baseURL, relativeURL) {
-  return relativeURL
-    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
-    : baseURL;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/cookies.js":
-/*!***************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/cookies.js ***!
-  \***************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-
-module.exports = (
-  utils.isStandardBrowserEnv() ?
-
-  // Standard browser envs support document.cookie
-    (function standardBrowserEnv() {
-      return {
-        write: function write(name, value, expires, path, domain, secure) {
-          var cookie = [];
-          cookie.push(name + '=' + encodeURIComponent(value));
-
-          if (utils.isNumber(expires)) {
-            cookie.push('expires=' + new Date(expires).toGMTString());
-          }
-
-          if (utils.isString(path)) {
-            cookie.push('path=' + path);
-          }
-
-          if (utils.isString(domain)) {
-            cookie.push('domain=' + domain);
-          }
-
-          if (secure === true) {
-            cookie.push('secure');
-          }
-
-          document.cookie = cookie.join('; ');
-        },
-
-        read: function read(name) {
-          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-          return (match ? decodeURIComponent(match[3]) : null);
-        },
-
-        remove: function remove(name) {
-          this.write(name, '', Date.now() - 86400000);
-        }
-      };
-    })() :
-
-  // Non standard browser env (web workers, react-native) lack needed support.
-    (function nonStandardBrowserEnv() {
-      return {
-        write: function write() {},
-        read: function read() { return null; },
-        remove: function remove() {}
-      };
-    })()
-);
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/isAbsoluteURL.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/isAbsoluteURL.js ***!
-  \*********************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * Determines whether the specified URL is absolute
- *
- * @param {string} url The URL to test
- * @returns {boolean} True if the specified URL is absolute, otherwise false
- */
-module.exports = function isAbsoluteURL(url) {
-  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
-  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
-  // by any combination of letters, digits, plus, period, or hyphen.
-  return /^([a-z][a-z\d+\-.]*:)?\/\//i.test(url);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/isAxiosError.js":
-/*!********************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/isAxiosError.js ***!
-  \********************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-
-/**
- * Determines whether the payload is an error thrown by Axios
- *
- * @param {*} payload The value to test
- * @returns {boolean} True if the payload is an error thrown by Axios, otherwise false
- */
-module.exports = function isAxiosError(payload) {
-  return utils.isObject(payload) && (payload.isAxiosError === true);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/isURLSameOrigin.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/isURLSameOrigin.js ***!
-  \***********************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-
-module.exports = (
-  utils.isStandardBrowserEnv() ?
-
-  // Standard browser envs have full support of the APIs needed to test
-  // whether the request URL is of the same origin as current location.
-    (function standardBrowserEnv() {
-      var msie = /(msie|trident)/i.test(navigator.userAgent);
-      var urlParsingNode = document.createElement('a');
-      var originURL;
-
-      /**
-    * Parse a URL to discover it's components
-    *
-    * @param {String} url The URL to be parsed
-    * @returns {Object}
-    */
-      function resolveURL(url) {
-        var href = url;
-
-        if (msie) {
-        // IE needs attribute set twice to normalize properties
-          urlParsingNode.setAttribute('href', href);
-          href = urlParsingNode.href;
-        }
-
-        urlParsingNode.setAttribute('href', href);
-
-        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-        return {
-          href: urlParsingNode.href,
-          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-          host: urlParsingNode.host,
-          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-          hostname: urlParsingNode.hostname,
-          port: urlParsingNode.port,
-          pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-            urlParsingNode.pathname :
-            '/' + urlParsingNode.pathname
-        };
-      }
-
-      originURL = resolveURL(window.location.href);
-
-      /**
-    * Determine if a URL shares the same origin as the current location
-    *
-    * @param {String} requestURL The URL to test
-    * @returns {boolean} True if URL shares the same origin, otherwise false
-    */
-      return function isURLSameOrigin(requestURL) {
-        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
-        return (parsed.protocol === originURL.protocol &&
-            parsed.host === originURL.host);
-      };
-    })() :
-
-  // Non standard browser envs (web workers, react-native) lack needed support.
-    (function nonStandardBrowserEnv() {
-      return function isURLSameOrigin() {
-        return true;
-      };
-    })()
-);
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/normalizeHeaderName.js":
-/*!***************************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/normalizeHeaderName.js ***!
-  \***************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ../utils */ "./node_modules/axios/lib/utils.js");
-
-module.exports = function normalizeHeaderName(headers, normalizedName) {
-  utils.forEach(headers, function processHeader(value, name) {
-    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
-      headers[normalizedName] = value;
-      delete headers[name];
-    }
-  });
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/parseHeaders.js":
-/*!********************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/parseHeaders.js ***!
-  \********************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ "./node_modules/axios/lib/utils.js");
-
-// Headers whose duplicates are ignored by node
-// c.f. https://nodejs.org/api/http.html#http_message_headers
-var ignoreDuplicateOf = [
-  'age', 'authorization', 'content-length', 'content-type', 'etag',
-  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
-  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
-  'referer', 'retry-after', 'user-agent'
-];
-
-/**
- * Parse headers into an object
- *
- * ```
- * Date: Wed, 27 Aug 2014 08:58:49 GMT
- * Content-Type: application/json
- * Connection: keep-alive
- * Transfer-Encoding: chunked
- * ```
- *
- * @param {String} headers Headers needing to be parsed
- * @returns {Object} Headers parsed into an object
- */
-module.exports = function parseHeaders(headers) {
-  var parsed = {};
-  var key;
-  var val;
-  var i;
-
-  if (!headers) { return parsed; }
-
-  utils.forEach(headers.split('\n'), function parser(line) {
-    i = line.indexOf(':');
-    key = utils.trim(line.substr(0, i)).toLowerCase();
-    val = utils.trim(line.substr(i + 1));
-
-    if (key) {
-      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
-        return;
-      }
-      if (key === 'set-cookie') {
-        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
-      } else {
-        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
-      }
-    }
-  });
-
-  return parsed;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/spread.js":
-/*!**************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/spread.js ***!
-  \**************************************************/
-/***/ ((module) => {
-
-"use strict";
-
-
-/**
- * Syntactic sugar for invoking a function and expanding an array for arguments.
- *
- * Common use case would be to use `Function.prototype.apply`.
- *
- *  ```js
- *  function f(x, y, z) {}
- *  var args = [1, 2, 3];
- *  f.apply(null, args);
- *  ```
- *
- * With `spread` this example can be re-written.
- *
- *  ```js
- *  spread(function(x, y, z) {})([1, 2, 3]);
- *  ```
- *
- * @param {Function} callback
- * @returns {Function}
- */
-module.exports = function spread(callback) {
-  return function wrap(arr) {
-    return callback.apply(null, arr);
-  };
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/helpers/validator.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/axios/lib/helpers/validator.js ***!
-  \*****************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var VERSION = (__webpack_require__(/*! ../env/data */ "./node_modules/axios/lib/env/data.js").version);
-
-var validators = {};
-
-// eslint-disable-next-line func-names
-['object', 'boolean', 'number', 'function', 'string', 'symbol'].forEach(function(type, i) {
-  validators[type] = function validator(thing) {
-    return typeof thing === type || 'a' + (i < 1 ? 'n ' : ' ') + type;
-  };
-});
-
-var deprecatedWarnings = {};
-
-/**
- * Transitional option validator
- * @param {function|boolean?} validator - set to false if the transitional option has been removed
- * @param {string?} version - deprecated version / removed since version
- * @param {string?} message - some message with additional info
- * @returns {function}
- */
-validators.transitional = function transitional(validator, version, message) {
-  function formatMessage(opt, desc) {
-    return '[Axios v' + VERSION + '] Transitional option \'' + opt + '\'' + desc + (message ? '. ' + message : '');
-  }
-
-  // eslint-disable-next-line func-names
-  return function(value, opt, opts) {
-    if (validator === false) {
-      throw new Error(formatMessage(opt, ' has been removed' + (version ? ' in ' + version : '')));
-    }
-
-    if (version && !deprecatedWarnings[opt]) {
-      deprecatedWarnings[opt] = true;
-      // eslint-disable-next-line no-console
-      console.warn(
-        formatMessage(
-          opt,
-          ' has been deprecated since v' + version + ' and will be removed in the near future'
-        )
-      );
-    }
-
-    return validator ? validator(value, opt, opts) : true;
-  };
-};
-
-/**
- * Assert object's properties type
- * @param {object} options
- * @param {object} schema
- * @param {boolean?} allowUnknown
- */
-
-function assertOptions(options, schema, allowUnknown) {
-  if (typeof options !== 'object') {
-    throw new TypeError('options must be an object');
-  }
-  var keys = Object.keys(options);
-  var i = keys.length;
-  while (i-- > 0) {
-    var opt = keys[i];
-    var validator = schema[opt];
-    if (validator) {
-      var value = options[opt];
-      var result = value === undefined || validator(value, opt, options);
-      if (result !== true) {
-        throw new TypeError('option ' + opt + ' must be ' + result);
-      }
-      continue;
-    }
-    if (allowUnknown !== true) {
-      throw Error('Unknown option ' + opt);
-    }
-  }
-}
-
-module.exports = {
-  assertOptions: assertOptions,
-  validators: validators
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/axios/lib/utils.js":
-/*!*****************************************!*\
-  !*** ./node_modules/axios/lib/utils.js ***!
-  \*****************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-
-
-var bind = __webpack_require__(/*! ./helpers/bind */ "./node_modules/axios/lib/helpers/bind.js");
-
-// utils is a library of generic helper functions non-specific to axios
-
-var toString = Object.prototype.toString;
-
-/**
- * Determine if a value is an Array
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Array, otherwise false
- */
-function isArray(val) {
-  return Array.isArray(val);
-}
-
-/**
- * Determine if a value is undefined
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if the value is undefined, otherwise false
- */
-function isUndefined(val) {
-  return typeof val === 'undefined';
-}
-
-/**
- * Determine if a value is a Buffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Buffer, otherwise false
- */
-function isBuffer(val) {
-  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor)
-    && typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
-}
-
-/**
- * Determine if a value is an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an ArrayBuffer, otherwise false
- */
-function isArrayBuffer(val) {
-  return toString.call(val) === '[object ArrayBuffer]';
-}
-
-/**
- * Determine if a value is a FormData
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an FormData, otherwise false
- */
-function isFormData(val) {
-  return toString.call(val) === '[object FormData]';
-}
-
-/**
- * Determine if a value is a view on an ArrayBuffer
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
- */
-function isArrayBufferView(val) {
-  var result;
-  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
-    result = ArrayBuffer.isView(val);
-  } else {
-    result = (val) && (val.buffer) && (isArrayBuffer(val.buffer));
-  }
-  return result;
-}
-
-/**
- * Determine if a value is a String
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a String, otherwise false
- */
-function isString(val) {
-  return typeof val === 'string';
-}
-
-/**
- * Determine if a value is a Number
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Number, otherwise false
- */
-function isNumber(val) {
-  return typeof val === 'number';
-}
-
-/**
- * Determine if a value is an Object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is an Object, otherwise false
- */
-function isObject(val) {
-  return val !== null && typeof val === 'object';
-}
-
-/**
- * Determine if a value is a plain Object
- *
- * @param {Object} val The value to test
- * @return {boolean} True if value is a plain Object, otherwise false
- */
-function isPlainObject(val) {
-  if (toString.call(val) !== '[object Object]') {
-    return false;
-  }
-
-  var prototype = Object.getPrototypeOf(val);
-  return prototype === null || prototype === Object.prototype;
-}
-
-/**
- * Determine if a value is a Date
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Date, otherwise false
- */
-function isDate(val) {
-  return toString.call(val) === '[object Date]';
-}
-
-/**
- * Determine if a value is a File
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a File, otherwise false
- */
-function isFile(val) {
-  return toString.call(val) === '[object File]';
-}
-
-/**
- * Determine if a value is a Blob
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Blob, otherwise false
- */
-function isBlob(val) {
-  return toString.call(val) === '[object Blob]';
-}
-
-/**
- * Determine if a value is a Function
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Function, otherwise false
- */
-function isFunction(val) {
-  return toString.call(val) === '[object Function]';
-}
-
-/**
- * Determine if a value is a Stream
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a Stream, otherwise false
- */
-function isStream(val) {
-  return isObject(val) && isFunction(val.pipe);
-}
-
-/**
- * Determine if a value is a URLSearchParams object
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if value is a URLSearchParams object, otherwise false
- */
-function isURLSearchParams(val) {
-  return toString.call(val) === '[object URLSearchParams]';
-}
-
-/**
- * Trim excess whitespace off the beginning and end of a string
- *
- * @param {String} str The String to trim
- * @returns {String} The String freed of excess whitespace
- */
-function trim(str) {
-  return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
-}
-
-/**
- * Determine if we're running in a standard browser environment
- *
- * This allows axios to run in a web worker, and react-native.
- * Both environments support XMLHttpRequest, but not fully standard globals.
- *
- * web workers:
- *  typeof window -> undefined
- *  typeof document -> undefined
- *
- * react-native:
- *  navigator.product -> 'ReactNative'
- * nativescript
- *  navigator.product -> 'NativeScript' or 'NS'
- */
-function isStandardBrowserEnv() {
-  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
-                                           navigator.product === 'NativeScript' ||
-                                           navigator.product === 'NS')) {
-    return false;
-  }
-  return (
-    typeof window !== 'undefined' &&
-    typeof document !== 'undefined'
-  );
-}
-
-/**
- * Iterate over an Array or an Object invoking a function for each item.
- *
- * If `obj` is an Array callback will be called passing
- * the value, index, and complete array for each item.
- *
- * If 'obj' is an Object callback will be called passing
- * the value, key, and complete object for each property.
- *
- * @param {Object|Array} obj The object to iterate
- * @param {Function} fn The callback to invoke for each item
- */
-function forEach(obj, fn) {
-  // Don't bother if no value provided
-  if (obj === null || typeof obj === 'undefined') {
-    return;
-  }
-
-  // Force an array if not already something iterable
-  if (typeof obj !== 'object') {
-    /*eslint no-param-reassign:0*/
-    obj = [obj];
-  }
-
-  if (isArray(obj)) {
-    // Iterate over array values
-    for (var i = 0, l = obj.length; i < l; i++) {
-      fn.call(null, obj[i], i, obj);
-    }
-  } else {
-    // Iterate over object keys
-    for (var key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        fn.call(null, obj[key], key, obj);
-      }
-    }
-  }
-}
-
-/**
- * Accepts varargs expecting each argument to be an object, then
- * immutably merges the properties of each object and returns result.
- *
- * When multiple objects contain the same key the later object in
- * the arguments list will take precedence.
- *
- * Example:
- *
- * ```js
- * var result = merge({foo: 123}, {foo: 456});
- * console.log(result.foo); // outputs 456
- * ```
- *
- * @param {Object} obj1 Object to merge
- * @returns {Object} Result of all merge properties
- */
-function merge(/* obj1, obj2, obj3, ... */) {
-  var result = {};
-  function assignValue(val, key) {
-    if (isPlainObject(result[key]) && isPlainObject(val)) {
-      result[key] = merge(result[key], val);
-    } else if (isPlainObject(val)) {
-      result[key] = merge({}, val);
-    } else if (isArray(val)) {
-      result[key] = val.slice();
-    } else {
-      result[key] = val;
-    }
-  }
-
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    forEach(arguments[i], assignValue);
-  }
-  return result;
-}
-
-/**
- * Extends object a by mutably adding to it the properties of object b.
- *
- * @param {Object} a The object to be extended
- * @param {Object} b The object to copy properties from
- * @param {Object} thisArg The object to bind function to
- * @return {Object} The resulting value of object a
- */
-function extend(a, b, thisArg) {
-  forEach(b, function assignValue(val, key) {
-    if (thisArg && typeof val === 'function') {
-      a[key] = bind(val, thisArg);
-    } else {
-      a[key] = val;
-    }
-  });
-  return a;
-}
-
-/**
- * Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
- *
- * @param {string} content with BOM
- * @return {string} content value without BOM
- */
-function stripBOM(content) {
-  if (content.charCodeAt(0) === 0xFEFF) {
-    content = content.slice(1);
-  }
-  return content;
-}
-
-module.exports = {
-  isArray: isArray,
-  isArrayBuffer: isArrayBuffer,
-  isBuffer: isBuffer,
-  isFormData: isFormData,
-  isArrayBufferView: isArrayBufferView,
-  isString: isString,
-  isNumber: isNumber,
-  isObject: isObject,
-  isPlainObject: isPlainObject,
-  isUndefined: isUndefined,
-  isDate: isDate,
-  isFile: isFile,
-  isBlob: isBlob,
-  isFunction: isFunction,
-  isStream: isStream,
-  isURLSearchParams: isURLSearchParams,
-  isStandardBrowserEnv: isStandardBrowserEnv,
-  forEach: forEach,
-  merge: merge,
-  extend: extend,
-  trim: trim,
-  stripBOM: stripBOM
-};
-
-
-/***/ }),
-
 /***/ "./node_modules/@inertiajs/inertia-svelte/src/App.svelte":
 /*!***************************************************************!*\
   !*** ./node_modules/@inertiajs/inertia-svelte/src/App.svelte ***!
@@ -9029,7 +6874,7 @@ function create_default_slot_1(ctx) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(if_block_anchor);
     }
   };
-} // (84:4) {#if $form.hasErrors}
+} // (86:4) {#if $form.hasErrors}
 
 
 function create_if_block(ctx) {
@@ -9093,8 +6938,8 @@ function create_default_slot(ctx) {
   var updating_checked;
   var t6;
   var div;
-  var t7;
   var button;
+  var t7;
   var current;
   formlogo = new _logos_FormLogo_svelte__WEBPACK_IMPORTED_MODULE_9__["default"]({});
   formheader = new _headers_FormHeader_svelte__WEBPACK_IMPORTED_MODULE_6__["default"]({
@@ -9160,9 +7005,6 @@ function create_default_slot(ctx) {
   svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
     return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(loginformextra, 'checked', loginformextra_checked_binding);
   });
-  var if_block =
-  /*$form*/
-  ctx[0].hasErrors && create_if_block(ctx);
   button = new _buttons_Button_svelte__WEBPACK_IMPORTED_MODULE_11__["default"]({
     props: {
       text: "Sign in",
@@ -9172,6 +7014,9 @@ function create_default_slot(ctx) {
       ctx[0].processing
     }
   });
+  var if_block =
+  /*$form*/
+  ctx[0].hasErrors && create_if_block(ctx);
   return {
     c: function c() {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(formlogo.$$.fragment);
@@ -9189,9 +7034,9 @@ function create_default_slot(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(loginformextra.$$.fragment);
       t6 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
       div = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("div");
-      if (if_block) if_block.c();
-      t7 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(button.$$.fragment);
+      t7 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      if (if_block) if_block.c();
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div, "class", "flex flex-col gap-y-4");
     },
     m: function m(target, anchor) {
@@ -9210,9 +7055,9 @@ function create_default_slot(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(loginformextra, target, anchor);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t6, anchor);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, div, anchor);
-      if (if_block) if_block.m(div, null);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div, t7);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(button, div, null);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div, t7);
+      if (if_block) if_block.m(div, null);
       current = true;
     },
     p: function p(ctx, dirty) {
@@ -9267,6 +7112,13 @@ function create_default_slot(ctx) {
       }
 
       loginformextra.$set(loginformextra_changes);
+      var button_changes = {};
+      if (dirty &
+      /*$form*/
+      1) button_changes.disabled =
+      /*$form*/
+      ctx[0].processing;
+      button.$set(button_changes);
 
       if (
       /*$form*/
@@ -9283,7 +7135,7 @@ function create_default_slot(ctx) {
           if_block = create_if_block(ctx);
           if_block.c();
           (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block, 1);
-          if_block.m(div, t7);
+          if_block.m(div, null);
         }
       } else if (if_block) {
         (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
@@ -9292,14 +7144,6 @@ function create_default_slot(ctx) {
         });
         (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
       }
-
-      var button_changes = {};
-      if (dirty &
-      /*$form*/
-      1) button_changes.disabled =
-      /*$form*/
-      ctx[0].processing;
-      button.$set(button_changes);
     },
     i: function i(local) {
       if (current) return;
@@ -9310,8 +7154,8 @@ function create_default_slot(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(inputgroup0.$$.fragment, local);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(inputgroup1.$$.fragment, local);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(loginformextra.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(button.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block);
       current = true;
     },
     o: function o(local) {
@@ -9322,8 +7166,8 @@ function create_default_slot(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(inputgroup0.$$.fragment, local);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(inputgroup1.$$.fragment, local);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(loginformextra.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(button.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block);
       current = false;
     },
     d: function d(detaching) {
@@ -9342,8 +7186,8 @@ function create_default_slot(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(loginformextra, detaching);
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t6);
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(div);
-      if (if_block) if_block.d();
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(button);
+      if (if_block) if_block.d();
     }
   };
 }
@@ -9491,24 +7335,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var svelte_internal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! svelte/internal */ "./node_modules/svelte/internal/index.mjs");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @inertiajs/inertia-svelte */ "./node_modules/@inertiajs/inertia-svelte/src/index.js");
-/* harmony import */ var _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @inertiajs/inertia */ "./node_modules/@inertiajs/inertia/dist/index.js");
-/* harmony import */ var _util_SocialButtonGroup_svelte__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../util/SocialButtonGroup.svelte */ "./resources/js/components/util/SocialButtonGroup.svelte");
-/* harmony import */ var _inputs_FormInputSelect_svelte__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../inputs/FormInputSelect.svelte */ "./resources/js/components/inputs/FormInputSelect.svelte");
-/* harmony import */ var _util_FormDivider_svelte__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../util/FormDivider.svelte */ "./resources/js/components/util/FormDivider.svelte");
-/* harmony import */ var _headers_FormHeader_svelte__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../headers/FormHeader.svelte */ "./resources/js/components/headers/FormHeader.svelte");
-/* harmony import */ var _inputs_InputGroup_svelte__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../inputs/InputGroup.svelte */ "./resources/js/components/inputs/InputGroup.svelte");
-/* harmony import */ var _display_FormAlert_svelte__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../display/FormAlert.svelte */ "./resources/js/components/display/FormAlert.svelte");
-/* harmony import */ var _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../inputs/FormInput.svelte */ "./resources/js/components/inputs/FormInput.svelte");
-/* harmony import */ var _logos_FormLogo_svelte__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../logos/FormLogo.svelte */ "./resources/js/components/logos/FormLogo.svelte");
-/* harmony import */ var _basics_Form_svelte__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../basics/Form.svelte */ "./resources/js/components/basics/Form.svelte");
-/* harmony import */ var _buttons_Button_svelte__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../buttons/Button.svelte */ "./resources/js/components/buttons/Button.svelte");
-/* harmony import */ var _config_axios__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../../config/axios */ "./resources/js/config/axios.js");
+/* harmony import */ var svelte_internal__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! svelte/internal */ "./node_modules/svelte/internal/index.mjs");
+/* harmony import */ var _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @inertiajs/inertia-svelte */ "./node_modules/@inertiajs/inertia-svelte/src/index.js");
+/* harmony import */ var _util_SocialButtonGroup_svelte__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/SocialButtonGroup.svelte */ "./resources/js/components/util/SocialButtonGroup.svelte");
+/* harmony import */ var _inputs_FormInputSelect_svelte__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../inputs/FormInputSelect.svelte */ "./resources/js/components/inputs/FormInputSelect.svelte");
+/* harmony import */ var _util_FormDivider_svelte__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../util/FormDivider.svelte */ "./resources/js/components/util/FormDivider.svelte");
+/* harmony import */ var _headers_FormHeader_svelte__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../headers/FormHeader.svelte */ "./resources/js/components/headers/FormHeader.svelte");
+/* harmony import */ var _inputs_InputGroup_svelte__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../inputs/InputGroup.svelte */ "./resources/js/components/inputs/InputGroup.svelte");
+/* harmony import */ var _display_FormAlert_svelte__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../display/FormAlert.svelte */ "./resources/js/components/display/FormAlert.svelte");
+/* harmony import */ var _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../inputs/FormInput.svelte */ "./resources/js/components/inputs/FormInput.svelte");
+/* harmony import */ var _logos_FormLogo_svelte__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../logos/FormLogo.svelte */ "./resources/js/components/logos/FormLogo.svelte");
+/* harmony import */ var _basics_Form_svelte__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../basics/Form.svelte */ "./resources/js/components/basics/Form.svelte");
+/* harmony import */ var _buttons_Button_svelte__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../buttons/Button.svelte */ "./resources/js/components/buttons/Button.svelte");
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../../util */ "./resources/js/util/index.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -9531,12 +7370,6 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -9550,8 +7383,6 @@ function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Sy
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 /* resources/js/components/layout/forms/RegisterForm.svelte generated by Svelte v3.47.0 */
-
-
 
  // local imports
 
@@ -9576,294 +7407,299 @@ function create_default_slot_5(ctx) {
   var dispose;
   return {
     c: function c() {
-      p = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.element)("p");
-      t0 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.text)("Or\n      ");
-      a = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.element)("a");
+      p = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("p");
+      t0 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.text)("Or\n      ");
+      a = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("a");
       a.textContent = "click here to sign in";
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(a, "href", "/login");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(a, "class", "text-primary");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(p, "class", "text-neutral");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a, "href", "/login");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a, "class", "text-primary");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(p, "class", "text-neutral");
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, p, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.append)(p, t0);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.append)(p, a);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, p, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(p, t0);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(p, a);
 
       if (!mounted) {
-        dispose = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.action_destroyer)(inertia_action = _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_3__.inertia.call(null, a));
+        dispose = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.action_destroyer)(inertia_action = _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_1__.inertia.call(null, a));
         mounted = true;
       }
     },
-    p: svelte_internal__WEBPACK_IMPORTED_MODULE_1__.noop,
+    p: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
     d: function d(detaching) {
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(p);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(p);
       mounted = false;
       dispose();
     }
   };
-} // (93:2) <InputGroup>
+} // (72:4) {:else}
 
 
-function create_default_slot_4(ctx) {
-  var forminput0;
+function create_else_block_5(ctx) {
+  var forminput;
   var updating_value;
-  var updating_error;
-  var t;
-  var forminput1;
-  var updating_value_1;
-  var updating_error_1;
   var current;
 
-  function forminput0_value_binding(value) {
-    /*forminput0_value_binding*/
-    ctx[6](value);
+  function forminput_value_binding_1(value) {
+    /*forminput_value_binding_1*/
+    ctx[5](value);
   }
 
-  function forminput0_error_binding(value) {
-    /*forminput0_error_binding*/
-    ctx[7](value);
-  }
-
-  var forminput0_props = {
+  var forminput_props = {
     type: "text",
     label: "name",
     placeholder: "John"
   };
 
   if (
-  /*formData*/
+  /*$form*/
   ctx[0].name !== void 0) {
-    forminput0_props.value =
-    /*formData*/
+    forminput_props.value =
+    /*$form*/
     ctx[0].name;
   }
 
+  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
+    props: forminput_props
+  });
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminput, 'value', forminput_value_binding_1);
+  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminput.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminput, target, anchor);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      var forminput_changes = {};
+
+      if (!updating_value && dirty &
+      /*$form*/
+      1) {
+        updating_value = true;
+        forminput_changes.value =
+        /*$form*/
+        ctx[0].name;
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
+          return updating_value = false;
+        });
+      }
+
+      forminput.$set(forminput_changes);
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminput.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminput.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
+    }
+  };
+} // (65:4) {#if $form.errors.name}
+
+
+function create_if_block_7(ctx) {
+  var forminput;
+  var updating_value;
+  var current;
+
+  function forminput_value_binding(value) {
+    /*forminput_value_binding*/
+    ctx[4](value);
+  }
+
+  var forminput_props = {
+    type: "text",
+    label: "name",
+    placeholder: "John",
+    error: true
+  };
+
   if (
-  /*inputErrors*/
-  ctx[1].name !== void 0) {
-    forminput0_props.error =
-    /*inputErrors*/
-    ctx[1].name;
+  /*$form*/
+  ctx[0].name !== void 0) {
+    forminput_props.value =
+    /*$form*/
+    ctx[0].name;
   }
 
-  forminput0 = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_11__["default"]({
-    props: forminput0_props
+  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
+    props: forminput_props
   });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput0, 'value', forminput0_value_binding);
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminput, 'value', forminput_value_binding);
   });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput0, 'error', forminput0_error_binding);
-  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminput.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminput, target, anchor);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      var forminput_changes = {};
 
-  function forminput1_value_binding(value) {
-    /*forminput1_value_binding*/
-    ctx[8](value);
+      if (!updating_value && dirty &
+      /*$form*/
+      1) {
+        updating_value = true;
+        forminput_changes.value =
+        /*$form*/
+        ctx[0].name;
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
+          return updating_value = false;
+        });
+      }
+
+      forminput.$set(forminput_changes);
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminput.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminput.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
+    }
+  };
+} // (87:4) {:else}
+
+
+function create_else_block_4(ctx) {
+  var forminput;
+  var updating_value;
+  var current;
+
+  function forminput_value_binding_3(value) {
+    /*forminput_value_binding_3*/
+    ctx[7](value);
   }
 
-  function forminput1_error_binding(value) {
-    /*forminput1_error_binding*/
-    ctx[9](value);
-  }
-
-  var forminput1_props = {
+  var forminput_props = {
     type: "text",
     label: "last name",
     placeholder: "Doe"
   };
 
   if (
-  /*formData*/
+  /*$form*/
   ctx[0].last_name !== void 0) {
-    forminput1_props.value =
-    /*formData*/
+    forminput_props.value =
+    /*$form*/
     ctx[0].last_name;
   }
 
-  if (
-  /*inputErrors*/
-  ctx[1].last_name !== void 0) {
-    forminput1_props.error =
-    /*inputErrors*/
-    ctx[1].last_name;
-  }
-
-  forminput1 = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_11__["default"]({
-    props: forminput1_props
+  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
+    props: forminput_props
   });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput1, 'value', forminput1_value_binding);
-  });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput1, 'error', forminput1_error_binding);
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminput, 'value', forminput_value_binding_3);
   });
   return {
     c: function c() {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(forminput0.$$.fragment);
-      t = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(forminput1.$$.fragment);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminput.$$.fragment);
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(forminput0, target, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, t, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(forminput1, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminput, target, anchor);
       current = true;
     },
     p: function p(ctx, dirty) {
-      var forminput0_changes = {};
+      var forminput_changes = {};
 
       if (!updating_value && dirty &
-      /*formData*/
+      /*$form*/
       1) {
         updating_value = true;
-        forminput0_changes.value =
-        /*formData*/
-        ctx[0].name;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
+        forminput_changes.value =
+        /*$form*/
+        ctx[0].last_name;
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
           return updating_value = false;
         });
       }
 
-      if (!updating_error && dirty &
-      /*inputErrors*/
-      2) {
-        updating_error = true;
-        forminput0_changes.error =
-        /*inputErrors*/
-        ctx[1].name;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
-          return updating_error = false;
-        });
-      }
-
-      forminput0.$set(forminput0_changes);
-      var forminput1_changes = {};
-
-      if (!updating_value_1 && dirty &
-      /*formData*/
-      1) {
-        updating_value_1 = true;
-        forminput1_changes.value =
-        /*formData*/
-        ctx[0].last_name;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
-          return updating_value_1 = false;
-        });
-      }
-
-      if (!updating_error_1 && dirty &
-      /*inputErrors*/
-      2) {
-        updating_error_1 = true;
-        forminput1_changes.error =
-        /*inputErrors*/
-        ctx[1].last_name;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
-          return updating_error_1 = false;
-        });
-      }
-
-      forminput1.$set(forminput1_changes);
+      forminput.$set(forminput_changes);
     },
     i: function i(local) {
       if (current) return;
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(forminput0.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(forminput1.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminput.$$.fragment, local);
       current = true;
     },
     o: function o(local) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(forminput0.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(forminput1.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminput.$$.fragment, local);
       current = false;
     },
     d: function d(detaching) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminput0, detaching);
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(t);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminput1, detaching);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
     }
   };
-} // (126:4) {:else}
+} // (80:4) {#if $form.errors.last_name}
 
 
-function create_else_block(ctx) {
+function create_if_block_6(ctx) {
   var forminput;
   var updating_value;
-  var updating_error;
   var current;
 
   function forminput_value_binding_2(value) {
     /*forminput_value_binding_2*/
-    ctx[14](value);
-  }
-
-  function forminput_error_binding_2(value) {
-    /*forminput_error_binding_2*/
-    ctx[15](value);
+    ctx[6](value);
   }
 
   var forminput_props = {
     type: "text",
-    label: "CRMV",
-    placeholder: "0000-00"
+    label: "last name",
+    placeholder: "Doe",
+    error: true
   };
 
   if (
-  /*formData*/
-  ctx[0].vet_crmv !== void 0) {
+  /*$form*/
+  ctx[0].last_name !== void 0) {
     forminput_props.value =
-    /*formData*/
-    ctx[0].vet_crmv;
+    /*$form*/
+    ctx[0].last_name;
   }
 
-  if (
-  /*inputErrors*/
-  ctx[1].vet_crmv !== void 0) {
-    forminput_props.error =
-    /*inputErrors*/
-    ctx[1].vet_crmv;
-  }
-
-  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_11__["default"]({
+  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
     props: forminput_props
   });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput, 'value', forminput_value_binding_2);
-  });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput, 'error', forminput_error_binding_2);
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminput, 'value', forminput_value_binding_2);
   });
   return {
     c: function c() {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(forminput.$$.fragment);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminput.$$.fragment);
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(forminput, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminput, target, anchor);
       current = true;
     },
     p: function p(ctx, dirty) {
       var forminput_changes = {};
 
       if (!updating_value && dirty &
-      /*formData*/
+      /*$form*/
       1) {
         updating_value = true;
         forminput_changes.value =
-        /*formData*/
-        ctx[0].vet_crmv;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
+        /*$form*/
+        ctx[0].last_name;
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
           return updating_value = false;
-        });
-      }
-
-      if (!updating_error && dirty &
-      /*inputErrors*/
-      2) {
-        updating_error = true;
-        forminput_changes.error =
-        /*inputErrors*/
-        ctx[1].vet_crmv;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
-          return updating_error = false;
         });
       }
 
@@ -9871,138 +7707,144 @@ function create_else_block(ctx) {
     },
     i: function i(local) {
       if (current) return;
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(forminput.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminput.$$.fragment, local);
       current = true;
     },
     o: function o(local) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(forminput.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminput.$$.fragment, local);
       current = false;
     },
     d: function d(detaching) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminput, detaching);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
     }
   };
-} // (119:4) {#if formData.type === 'TUTOR'}
+} // (63:2) <InputGroup>
 
 
-function create_if_block(ctx) {
-  var forminput;
-  var updating_value;
-  var updating_error;
-  var current;
-
-  function forminput_value_binding_1(value) {
-    /*forminput_value_binding_1*/
-    ctx[12](value);
-  }
-
-  function forminput_error_binding_1(value) {
-    /*forminput_error_binding_1*/
-    ctx[13](value);
-  }
-
-  var forminput_props = {
-    type: "text",
-    label: "CPF",
-    placeholder: "000.000.000-00"
-  };
-
-  if (
-  /*formData*/
-  ctx[0].tutor_cpf !== void 0) {
-    forminput_props.value =
-    /*formData*/
-    ctx[0].tutor_cpf;
-  }
-
-  if (
-  /*inputErrors*/
-  ctx[1].tutor_cpf !== void 0) {
-    forminput_props.error =
-    /*inputErrors*/
-    ctx[1].tutor_cpf;
-  }
-
-  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_11__["default"]({
-    props: forminput_props
-  });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput, 'value', forminput_value_binding_1);
-  });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput, 'error', forminput_error_binding_1);
-  });
-  return {
-    c: function c() {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(forminput.$$.fragment);
-    },
-    m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(forminput, target, anchor);
-      current = true;
-    },
-    p: function p(ctx, dirty) {
-      var forminput_changes = {};
-
-      if (!updating_value && dirty &
-      /*formData*/
-      1) {
-        updating_value = true;
-        forminput_changes.value =
-        /*formData*/
-        ctx[0].tutor_cpf;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
-          return updating_value = false;
-        });
-      }
-
-      if (!updating_error && dirty &
-      /*inputErrors*/
-      2) {
-        updating_error = true;
-        forminput_changes.error =
-        /*inputErrors*/
-        ctx[1].tutor_cpf;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
-          return updating_error = false;
-        });
-      }
-
-      forminput.$set(forminput_changes);
-    },
-    i: function i(local) {
-      if (current) return;
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(forminput.$$.fragment, local);
-      current = true;
-    },
-    o: function o(local) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(forminput.$$.fragment, local);
-      current = false;
-    },
-    d: function d(detaching) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminput, detaching);
-    }
-  };
-} // (110:2) <InputGroup>
-
-
-function create_default_slot_3(ctx) {
-  var forminput;
-  var updating_value;
-  var updating_error;
-  var t;
+function create_default_slot_4(ctx) {
   var current_block_type_index;
-  var if_block;
-  var if_block_anchor;
+  var if_block0;
+  var t;
+  var current_block_type_index_1;
+  var if_block1;
+  var if_block1_anchor;
   var current;
+  var if_block_creators = [create_if_block_7, create_else_block_5];
+  var if_blocks = [];
 
-  function forminput_value_binding(value) {
-    /*forminput_value_binding*/
-    ctx[10](value);
+  function select_block_type(ctx, dirty) {
+    if (
+    /*$form*/
+    ctx[0].errors.name) return 0;
+    return 1;
   }
 
-  function forminput_error_binding(value) {
-    /*forminput_error_binding*/
-    ctx[11](value);
+  current_block_type_index = select_block_type(ctx, -1);
+  if_block0 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+  var if_block_creators_1 = [create_if_block_6, create_else_block_4];
+  var if_blocks_1 = [];
+
+  function select_block_type_1(ctx, dirty) {
+    if (
+    /*$form*/
+    ctx[0].errors.last_name) return 0;
+    return 1;
+  }
+
+  current_block_type_index_1 = select_block_type_1(ctx, -1);
+  if_block1 = if_blocks_1[current_block_type_index_1] = if_block_creators_1[current_block_type_index_1](ctx);
+  return {
+    c: function c() {
+      if_block0.c();
+      t = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      if_block1.c();
+      if_block1_anchor = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.empty)();
+    },
+    m: function m(target, anchor) {
+      if_blocks[current_block_type_index].m(target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t, anchor);
+      if_blocks_1[current_block_type_index_1].m(target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, if_block1_anchor, anchor);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      var previous_block_index = current_block_type_index;
+      current_block_type_index = select_block_type(ctx, dirty);
+
+      if (current_block_type_index === previous_block_index) {
+        if_blocks[current_block_type_index].p(ctx, dirty);
+      } else {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_blocks[previous_block_index], 1, 1, function () {
+          if_blocks[previous_block_index] = null;
+        });
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
+        if_block0 = if_blocks[current_block_type_index];
+
+        if (!if_block0) {
+          if_block0 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+          if_block0.c();
+        } else {
+          if_block0.p(ctx, dirty);
+        }
+
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block0, 1);
+        if_block0.m(t.parentNode, t);
+      }
+
+      var previous_block_index_1 = current_block_type_index_1;
+      current_block_type_index_1 = select_block_type_1(ctx, dirty);
+
+      if (current_block_type_index_1 === previous_block_index_1) {
+        if_blocks_1[current_block_type_index_1].p(ctx, dirty);
+      } else {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_blocks_1[previous_block_index_1], 1, 1, function () {
+          if_blocks_1[previous_block_index_1] = null;
+        });
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
+        if_block1 = if_blocks_1[current_block_type_index_1];
+
+        if (!if_block1) {
+          if_block1 = if_blocks_1[current_block_type_index_1] = if_block_creators_1[current_block_type_index_1](ctx);
+          if_block1.c();
+        } else {
+          if_block1.p(ctx, dirty);
+        }
+
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block1, 1);
+        if_block1.m(if_block1_anchor.parentNode, if_block1_anchor);
+      }
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block0);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block1);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block0);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block1);
+      current = false;
+    },
+    d: function d(detaching) {
+      if_blocks[current_block_type_index].d(detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t);
+      if_blocks_1[current_block_type_index_1].d(detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(if_block1_anchor);
+    }
+  };
+} // (105:4) {:else}
+
+
+function create_else_block_3(ctx) {
+  var forminput;
+  var updating_value;
+  var current;
+
+  function forminput_value_binding_5(value) {
+    /*forminput_value_binding_5*/
+    ctx[9](value);
   }
 
   var forminput_props = {
@@ -10012,95 +7854,314 @@ function create_default_slot_3(ctx) {
   };
 
   if (
-  /*formData*/
+  /*$form*/
   ctx[0].email !== void 0) {
     forminput_props.value =
-    /*formData*/
+    /*$form*/
     ctx[0].email;
   }
 
-  if (
-  /*inputErrors*/
-  ctx[1].email !== void 0) {
-    forminput_props.error =
-    /*inputErrors*/
-    ctx[1].email;
-  }
-
-  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_11__["default"]({
+  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
     props: forminput_props
   });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput, 'value', forminput_value_binding);
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminput, 'value', forminput_value_binding_5);
   });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput, 'error', forminput_error_binding);
-  });
-  var if_block_creators = [create_if_block, create_else_block];
-  var if_blocks = [];
-
-  function select_block_type(ctx, dirty) {
-    if (
-    /*formData*/
-    ctx[0].type === 'TUTOR') return 0;
-    return 1;
-  }
-
-  current_block_type_index = select_block_type(ctx, -1);
-  if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
   return {
     c: function c() {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(forminput.$$.fragment);
-      t = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
-      if_block.c();
-      if_block_anchor = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.empty)();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminput.$$.fragment);
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(forminput, target, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, t, anchor);
-      if_blocks[current_block_type_index].m(target, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, if_block_anchor, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminput, target, anchor);
       current = true;
     },
     p: function p(ctx, dirty) {
       var forminput_changes = {};
 
       if (!updating_value && dirty &
-      /*formData*/
+      /*$form*/
       1) {
         updating_value = true;
         forminput_changes.value =
-        /*formData*/
+        /*$form*/
         ctx[0].email;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
           return updating_value = false;
         });
       }
 
-      if (!updating_error && dirty &
-      /*inputErrors*/
-      2) {
-        updating_error = true;
-        forminput_changes.error =
-        /*inputErrors*/
-        ctx[1].email;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
-          return updating_error = false;
+      forminput.$set(forminput_changes);
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminput.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminput.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
+    }
+  };
+} // (98:4) {#if $form.errors.email}
+
+
+function create_if_block_5(ctx) {
+  var forminput;
+  var updating_value;
+  var current;
+
+  function forminput_value_binding_4(value) {
+    /*forminput_value_binding_4*/
+    ctx[8](value);
+  }
+
+  var forminput_props = {
+    type: "text",
+    label: "email address",
+    placeholder: "john.doe@mail.com",
+    error: true
+  };
+
+  if (
+  /*$form*/
+  ctx[0].email !== void 0) {
+    forminput_props.value =
+    /*$form*/
+    ctx[0].email;
+  }
+
+  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
+    props: forminput_props
+  });
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminput, 'value', forminput_value_binding_4);
+  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminput.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminput, target, anchor);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      var forminput_changes = {};
+
+      if (!updating_value && dirty &
+      /*$form*/
+      1) {
+        updating_value = true;
+        forminput_changes.value =
+        /*$form*/
+        ctx[0].email;
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
+          return updating_value = false;
         });
       }
 
       forminput.$set(forminput_changes);
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminput.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminput.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
+    }
+  };
+} // (136:4) {:else}
+
+
+function create_else_block_2(ctx) {
+  var forminput;
+  var updating_value;
+  var current;
+
+  function forminput_value_binding_9(value) {
+    /*forminput_value_binding_9*/
+    ctx[13](value);
+  }
+
+  var forminput_props = {
+    type: "text",
+    label: "CRMV",
+    placeholder: "0000-00"
+  };
+
+  if (
+  /*$form*/
+  ctx[0].vet_crmv !== void 0) {
+    forminput_props.value =
+    /*$form*/
+    ctx[0].vet_crmv;
+  }
+
+  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
+    props: forminput_props
+  });
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminput, 'value', forminput_value_binding_9);
+  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminput.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminput, target, anchor);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      var forminput_changes = {};
+
+      if (!updating_value && dirty &
+      /*$form*/
+      1) {
+        updating_value = true;
+        forminput_changes.value =
+        /*$form*/
+        ctx[0].vet_crmv;
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
+          return updating_value = false;
+        });
+      }
+
+      forminput.$set(forminput_changes);
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminput.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminput.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
+    }
+  };
+} // (129:36) 
+
+
+function create_if_block_4(ctx) {
+  var forminput;
+  var updating_value;
+  var current;
+
+  function forminput_value_binding_8(value) {
+    /*forminput_value_binding_8*/
+    ctx[12](value);
+  }
+
+  var forminput_props = {
+    type: "text",
+    label: "CRMV",
+    placeholder: "0000-00",
+    error: true
+  };
+
+  if (
+  /*$form*/
+  ctx[0].vet_crmv !== void 0) {
+    forminput_props.value =
+    /*$form*/
+    ctx[0].vet_crmv;
+  }
+
+  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
+    props: forminput_props
+  });
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminput, 'value', forminput_value_binding_8);
+  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminput.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminput, target, anchor);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      var forminput_changes = {};
+
+      if (!updating_value && dirty &
+      /*$form*/
+      1) {
+        updating_value = true;
+        forminput_changes.value =
+        /*$form*/
+        ctx[0].vet_crmv;
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
+          return updating_value = false;
+        });
+      }
+
+      forminput.$set(forminput_changes);
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminput.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminput.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
+    }
+  };
+} // (114:4) {#if $form.type === 'TUTOR'}
+
+
+function create_if_block_2(ctx) {
+  var current_block_type_index;
+  var if_block;
+  var if_block_anchor;
+  var current;
+  var if_block_creators = [create_if_block_3, create_else_block_1];
+  var if_blocks = [];
+
+  function select_block_type_4(ctx, dirty) {
+    if (
+    /*$form*/
+    ctx[0].errors.tutor_cpf) return 0;
+    return 1;
+  }
+
+  current_block_type_index = select_block_type_4(ctx, -1);
+  if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+  return {
+    c: function c() {
+      if_block.c();
+      if_block_anchor = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.empty)();
+    },
+    m: function m(target, anchor) {
+      if_blocks[current_block_type_index].m(target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, if_block_anchor, anchor);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
       var previous_block_index = current_block_type_index;
-      current_block_type_index = select_block_type(ctx, dirty);
+      current_block_type_index = select_block_type_4(ctx, dirty);
 
       if (current_block_type_index === previous_block_index) {
         if_blocks[current_block_type_index].p(ctx, dirty);
       } else {
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.group_outros)();
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(if_blocks[previous_block_index], 1, 1, function () {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_blocks[previous_block_index], 1, 1, function () {
           if_blocks[previous_block_index] = null;
         });
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.check_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
         if_block = if_blocks[current_block_type_index];
 
         if (!if_block) {
@@ -10110,210 +8171,548 @@ function create_default_slot_3(ctx) {
           if_block.p(ctx, dirty);
         }
 
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(if_block, 1);
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block, 1);
         if_block.m(if_block_anchor.parentNode, if_block_anchor);
       }
     },
     i: function i(local) {
       if (current) return;
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(forminput.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(if_block);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block);
       current = true;
     },
     o: function o(local) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(forminput.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(if_block);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block);
       current = false;
     },
     d: function d(detaching) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminput, detaching);
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(t);
       if_blocks[current_block_type_index].d(detaching);
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(if_block_anchor);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(if_block_anchor);
     }
   };
-} // (136:2) <InputGroup>
+} // (122:6) {:else}
 
 
-function create_default_slot_2(ctx) {
-  var forminput0;
+function create_else_block_1(ctx) {
+  var forminput;
   var updating_value;
-  var updating_error;
-  var t;
-  var forminput1;
-  var updating_value_1;
-  var updating_error_1;
   var current;
 
-  function forminput0_value_binding_1(value) {
-    /*forminput0_value_binding_1*/
-    ctx[16](value);
+  function forminput_value_binding_7(value) {
+    /*forminput_value_binding_7*/
+    ctx[11](value);
   }
 
-  function forminput0_error_binding_1(value) {
-    /*forminput0_error_binding_1*/
-    ctx[17](value);
+  var forminput_props = {
+    type: "text",
+    label: "CPF",
+    placeholder: "000.000.000-00"
+  };
+
+  if (
+  /*$form*/
+  ctx[0].tutor_cpf !== void 0) {
+    forminput_props.value =
+    /*$form*/
+    ctx[0].tutor_cpf;
   }
 
-  var forminput0_props = {
+  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
+    props: forminput_props
+  });
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminput, 'value', forminput_value_binding_7);
+  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminput.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminput, target, anchor);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      var forminput_changes = {};
+
+      if (!updating_value && dirty &
+      /*$form*/
+      1) {
+        updating_value = true;
+        forminput_changes.value =
+        /*$form*/
+        ctx[0].tutor_cpf;
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
+          return updating_value = false;
+        });
+      }
+
+      forminput.$set(forminput_changes);
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminput.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminput.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
+    }
+  };
+} // (115:6) {#if $form.errors.tutor_cpf}
+
+
+function create_if_block_3(ctx) {
+  var forminput;
+  var updating_value;
+  var current;
+
+  function forminput_value_binding_6(value) {
+    /*forminput_value_binding_6*/
+    ctx[10](value);
+  }
+
+  var forminput_props = {
+    type: "text",
+    label: "CPF",
+    placeholder: "000.000.000-00",
+    error: true
+  };
+
+  if (
+  /*$form*/
+  ctx[0].tutor_cpf !== void 0) {
+    forminput_props.value =
+    /*$form*/
+    ctx[0].tutor_cpf;
+  }
+
+  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
+    props: forminput_props
+  });
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminput, 'value', forminput_value_binding_6);
+  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminput.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminput, target, anchor);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      var forminput_changes = {};
+
+      if (!updating_value && dirty &
+      /*$form*/
+      1) {
+        updating_value = true;
+        forminput_changes.value =
+        /*$form*/
+        ctx[0].tutor_cpf;
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
+          return updating_value = false;
+        });
+      }
+
+      forminput.$set(forminput_changes);
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminput.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminput.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
+    }
+  };
+} // (96:2) <InputGroup>
+
+
+function create_default_slot_3(ctx) {
+  var current_block_type_index;
+  var if_block0;
+  var t;
+  var current_block_type_index_1;
+  var if_block1;
+  var if_block1_anchor;
+  var current;
+  var if_block_creators = [create_if_block_5, create_else_block_3];
+  var if_blocks = [];
+
+  function select_block_type_2(ctx, dirty) {
+    if (
+    /*$form*/
+    ctx[0].errors.email) return 0;
+    return 1;
+  }
+
+  current_block_type_index = select_block_type_2(ctx, -1);
+  if_block0 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+  var if_block_creators_1 = [create_if_block_2, create_if_block_4, create_else_block_2];
+  var if_blocks_1 = [];
+
+  function select_block_type_3(ctx, dirty) {
+    if (
+    /*$form*/
+    ctx[0].type === 'TUTOR') return 0;
+    if (
+    /*$form*/
+    ctx[0].errors.vet_crmv) return 1;
+    return 2;
+  }
+
+  current_block_type_index_1 = select_block_type_3(ctx, -1);
+  if_block1 = if_blocks_1[current_block_type_index_1] = if_block_creators_1[current_block_type_index_1](ctx);
+  return {
+    c: function c() {
+      if_block0.c();
+      t = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      if_block1.c();
+      if_block1_anchor = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.empty)();
+    },
+    m: function m(target, anchor) {
+      if_blocks[current_block_type_index].m(target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t, anchor);
+      if_blocks_1[current_block_type_index_1].m(target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, if_block1_anchor, anchor);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      var previous_block_index = current_block_type_index;
+      current_block_type_index = select_block_type_2(ctx, dirty);
+
+      if (current_block_type_index === previous_block_index) {
+        if_blocks[current_block_type_index].p(ctx, dirty);
+      } else {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_blocks[previous_block_index], 1, 1, function () {
+          if_blocks[previous_block_index] = null;
+        });
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
+        if_block0 = if_blocks[current_block_type_index];
+
+        if (!if_block0) {
+          if_block0 = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+          if_block0.c();
+        } else {
+          if_block0.p(ctx, dirty);
+        }
+
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block0, 1);
+        if_block0.m(t.parentNode, t);
+      }
+
+      var previous_block_index_1 = current_block_type_index_1;
+      current_block_type_index_1 = select_block_type_3(ctx, dirty);
+
+      if (current_block_type_index_1 === previous_block_index_1) {
+        if_blocks_1[current_block_type_index_1].p(ctx, dirty);
+      } else {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_blocks_1[previous_block_index_1], 1, 1, function () {
+          if_blocks_1[previous_block_index_1] = null;
+        });
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
+        if_block1 = if_blocks_1[current_block_type_index_1];
+
+        if (!if_block1) {
+          if_block1 = if_blocks_1[current_block_type_index_1] = if_block_creators_1[current_block_type_index_1](ctx);
+          if_block1.c();
+        } else {
+          if_block1.p(ctx, dirty);
+        }
+
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block1, 1);
+        if_block1.m(if_block1_anchor.parentNode, if_block1_anchor);
+      }
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block0);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block1);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block0);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block1);
+      current = false;
+    },
+    d: function d(detaching) {
+      if_blocks[current_block_type_index].d(detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t);
+      if_blocks_1[current_block_type_index_1].d(detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(if_block1_anchor);
+    }
+  };
+} // (154:4) {:else}
+
+
+function create_else_block(ctx) {
+  var forminput;
+  var updating_value;
+  var current;
+
+  function forminput_value_binding_11(value) {
+    /*forminput_value_binding_11*/
+    ctx[15](value);
+  }
+
+  var forminput_props = {
     type: "password",
     label: "password",
     placeholder: "******"
   };
 
   if (
-  /*formData*/
+  /*$form*/
   ctx[0].password !== void 0) {
-    forminput0_props.value =
-    /*formData*/
+    forminput_props.value =
+    /*$form*/
     ctx[0].password;
   }
 
+  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
+    props: forminput_props
+  });
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminput, 'value', forminput_value_binding_11);
+  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminput.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminput, target, anchor);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      var forminput_changes = {};
+
+      if (!updating_value && dirty &
+      /*$form*/
+      1) {
+        updating_value = true;
+        forminput_changes.value =
+        /*$form*/
+        ctx[0].password;
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
+          return updating_value = false;
+        });
+      }
+
+      forminput.$set(forminput_changes);
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminput.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminput.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
+    }
+  };
+} // (147:4) {#if $form.errors.password}
+
+
+function create_if_block_1(ctx) {
+  var forminput;
+  var updating_value;
+  var current;
+
+  function forminput_value_binding_10(value) {
+    /*forminput_value_binding_10*/
+    ctx[14](value);
+  }
+
+  var forminput_props = {
+    type: "password",
+    label: "password",
+    placeholder: "******",
+    error: true
+  };
+
   if (
-  /*inputErrors*/
-  ctx[1].password !== void 0) {
-    forminput0_props.error =
-    /*inputErrors*/
-    ctx[1].password;
+  /*$form*/
+  ctx[0].password !== void 0) {
+    forminput_props.value =
+    /*$form*/
+    ctx[0].password;
   }
 
-  forminput0 = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_11__["default"]({
-    props: forminput0_props
+  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
+    props: forminput_props
   });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput0, 'value', forminput0_value_binding_1);
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminput, 'value', forminput_value_binding_10);
   });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput0, 'error', forminput0_error_binding_1);
-  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminput.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminput, target, anchor);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      var forminput_changes = {};
 
-  function forminput1_value_binding_1(value) {
-    /*forminput1_value_binding_1*/
-    ctx[18](value);
+      if (!updating_value && dirty &
+      /*$form*/
+      1) {
+        updating_value = true;
+        forminput_changes.value =
+        /*$form*/
+        ctx[0].password;
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
+          return updating_value = false;
+        });
+      }
+
+      forminput.$set(forminput_changes);
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminput.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminput.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
+    }
+  };
+} // (145:2) <InputGroup>
+
+
+function create_default_slot_2(ctx) {
+  var current_block_type_index;
+  var if_block;
+  var t;
+  var forminput;
+  var updating_value;
+  var current;
+  var if_block_creators = [create_if_block_1, create_else_block];
+  var if_blocks = [];
+
+  function select_block_type_5(ctx, dirty) {
+    if (
+    /*$form*/
+    ctx[0].errors.password) return 0;
+    return 1;
   }
 
-  function forminput1_error_binding_1(value) {
-    /*forminput1_error_binding_1*/
-    ctx[19](value);
+  current_block_type_index = select_block_type_5(ctx, -1);
+  if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+
+  function forminput_value_binding_12(value) {
+    /*forminput_value_binding_12*/
+    ctx[16](value);
   }
 
-  var forminput1_props = {
+  var forminput_props = {
     type: "password",
     label: "confirm password",
     placeholder: "******"
   };
 
   if (
-  /*formData*/
+  /*$form*/
   ctx[0].password_confirmation !== void 0) {
-    forminput1_props.value =
-    /*formData*/
+    forminput_props.value =
+    /*$form*/
     ctx[0].password_confirmation;
   }
 
-  if (
-  /*inputErrors*/
-  ctx[1].password_confirmation !== void 0) {
-    forminput1_props.error =
-    /*inputErrors*/
-    ctx[1].password_confirmation;
-  }
-
-  forminput1 = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_11__["default"]({
-    props: forminput1_props
+  forminput = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
+    props: forminput_props
   });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput1, 'value', forminput1_value_binding_1);
-  });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminput1, 'error', forminput1_error_binding_1);
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminput, 'value', forminput_value_binding_12);
   });
   return {
     c: function c() {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(forminput0.$$.fragment);
-      t = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(forminput1.$$.fragment);
+      if_block.c();
+      t = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminput.$$.fragment);
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(forminput0, target, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, t, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(forminput1, target, anchor);
+      if_blocks[current_block_type_index].m(target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminput, target, anchor);
       current = true;
     },
     p: function p(ctx, dirty) {
-      var forminput0_changes = {};
+      var previous_block_index = current_block_type_index;
+      current_block_type_index = select_block_type_5(ctx, dirty);
+
+      if (current_block_type_index === previous_block_index) {
+        if_blocks[current_block_type_index].p(ctx, dirty);
+      } else {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_blocks[previous_block_index], 1, 1, function () {
+          if_blocks[previous_block_index] = null;
+        });
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
+        if_block = if_blocks[current_block_type_index];
+
+        if (!if_block) {
+          if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+          if_block.c();
+        } else {
+          if_block.p(ctx, dirty);
+        }
+
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block, 1);
+        if_block.m(t.parentNode, t);
+      }
+
+      var forminput_changes = {};
 
       if (!updating_value && dirty &
-      /*formData*/
+      /*$form*/
       1) {
         updating_value = true;
-        forminput0_changes.value =
-        /*formData*/
-        ctx[0].password;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
+        forminput_changes.value =
+        /*$form*/
+        ctx[0].password_confirmation;
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
           return updating_value = false;
         });
       }
 
-      if (!updating_error && dirty &
-      /*inputErrors*/
-      2) {
-        updating_error = true;
-        forminput0_changes.error =
-        /*inputErrors*/
-        ctx[1].password;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
-          return updating_error = false;
-        });
-      }
-
-      forminput0.$set(forminput0_changes);
-      var forminput1_changes = {};
-
-      if (!updating_value_1 && dirty &
-      /*formData*/
-      1) {
-        updating_value_1 = true;
-        forminput1_changes.value =
-        /*formData*/
-        ctx[0].password_confirmation;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
-          return updating_value_1 = false;
-        });
-      }
-
-      if (!updating_error_1 && dirty &
-      /*inputErrors*/
-      2) {
-        updating_error_1 = true;
-        forminput1_changes.error =
-        /*inputErrors*/
-        ctx[1].password_confirmation;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
-          return updating_error_1 = false;
-        });
-      }
-
-      forminput1.$set(forminput1_changes);
+      forminput.$set(forminput_changes);
     },
     i: function i(local) {
       if (current) return;
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(forminput0.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(forminput1.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminput.$$.fragment, local);
       current = true;
     },
     o: function o(local) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(forminput0.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(forminput1.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminput.$$.fragment, local);
       current = false;
     },
     d: function d(detaching) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminput0, detaching);
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(t);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminput1, detaching);
+      if_blocks[current_block_type_index].d(detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
     }
   };
-} // (154:4) <InputGroup>
+} // (170:4) <InputGroup>
 
 
 function create_default_slot_1(ctx) {
@@ -10323,49 +8722,49 @@ function create_default_slot_1(ctx) {
 
   function forminputselect_value_binding(value) {
     /*forminputselect_value_binding*/
-    ctx[20](value);
+    ctx[17](value);
   }
 
   var forminputselect_props = {
     label: "who Am I?",
     options:
     /*inputOptions*/
-    ctx[4]
+    ctx[2]
   };
 
   if (
-  /*formData*/
+  /*$form*/
   ctx[0].type !== void 0) {
     forminputselect_props.value =
-    /*formData*/
+    /*$form*/
     ctx[0].type;
   }
 
-  forminputselect = new _inputs_FormInputSelect_svelte__WEBPACK_IMPORTED_MODULE_6__["default"]({
+  forminputselect = new _inputs_FormInputSelect_svelte__WEBPACK_IMPORTED_MODULE_3__["default"]({
     props: forminputselect_props
   });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(forminputselect, 'value', forminputselect_value_binding);
+  svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
+    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.bind)(forminputselect, 'value', forminputselect_value_binding);
   });
   return {
     c: function c() {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(forminputselect.$$.fragment);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(forminputselect.$$.fragment);
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(forminputselect, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(forminputselect, target, anchor);
       current = true;
     },
     p: function p(ctx, dirty) {
       var forminputselect_changes = {};
 
       if (!updating_value && dirty &
-      /*formData*/
+      /*$form*/
       1) {
         updating_value = true;
         forminputselect_changes.value =
-        /*formData*/
+        /*$form*/
         ctx[0].type;
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_flush_callback)(function () {
           return updating_value = false;
         });
       }
@@ -10374,18 +8773,62 @@ function create_default_slot_1(ctx) {
     },
     i: function i(local) {
       if (current) return;
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(forminputselect.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(forminputselect.$$.fragment, local);
       current = true;
     },
     o: function o(local) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(forminputselect.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(forminputselect.$$.fragment, local);
       current = false;
     },
     d: function d(detaching) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminputselect, detaching);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminputselect, detaching);
     }
   };
-} // (75:0) <Form handleSubmit={handleSubmit}>
+} // (179:4) {#if $form.hasErrors}
+
+
+function create_if_block(ctx) {
+  var formalert;
+  var current;
+  formalert = new _display_FormAlert_svelte__WEBPACK_IMPORTED_MODULE_7__["default"]({
+    props: {
+      open: true,
+      text: (0,_util__WEBPACK_IMPORTED_MODULE_12__.handleFormErrorMessage)(
+      /*$form*/
+      ctx[0].errors)
+    }
+  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(formalert.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(formalert, target, anchor);
+      current = true;
+    },
+    p: function p(ctx, dirty) {
+      var formalert_changes = {};
+      if (dirty &
+      /*$form*/
+      1) formalert_changes.text = (0,_util__WEBPACK_IMPORTED_MODULE_12__.handleFormErrorMessage)(
+      /*$form*/
+      ctx[0].errors);
+      formalert.$set(formalert_changes);
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(formalert.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(formalert.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(formalert, detaching);
+    }
+  };
+} // (45:0) <Form handleSubmit={handleSubmit}>
 
 
 function create_default_slot(ctx) {
@@ -10406,14 +8849,11 @@ function create_default_slot(ctx) {
   var div;
   var inputgroup3;
   var t7;
-  var formalert;
-  var updating_open;
-  var updating_text;
-  var t8;
   var button;
+  var t8;
   var current;
-  formlogo = new _logos_FormLogo_svelte__WEBPACK_IMPORTED_MODULE_12__["default"]({});
-  formheader = new _headers_FormHeader_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
+  formlogo = new _logos_FormLogo_svelte__WEBPACK_IMPORTED_MODULE_9__["default"]({});
+  formheader = new _headers_FormHeader_svelte__WEBPACK_IMPORTED_MODULE_5__["default"]({
     props: {
       text: "Sign up right now",
       $$slots: {
@@ -10424,17 +8864,17 @@ function create_default_slot(ctx) {
       }
     }
   });
-  socialbuttongroup = new _util_SocialButtonGroup_svelte__WEBPACK_IMPORTED_MODULE_5__["default"]({
+  socialbuttongroup = new _util_SocialButtonGroup_svelte__WEBPACK_IMPORTED_MODULE_2__["default"]({
     props: {
       text: "Sign up with"
     }
   });
-  formdivider = new _util_FormDivider_svelte__WEBPACK_IMPORTED_MODULE_7__["default"]({
+  formdivider = new _util_FormDivider_svelte__WEBPACK_IMPORTED_MODULE_4__["default"]({
     props: {
       text: "Or continue with"
     }
   });
-  inputgroup0 = new _inputs_InputGroup_svelte__WEBPACK_IMPORTED_MODULE_9__["default"]({
+  inputgroup0 = new _inputs_InputGroup_svelte__WEBPACK_IMPORTED_MODULE_6__["default"]({
     props: {
       $$slots: {
         "default": [create_default_slot_4]
@@ -10444,7 +8884,7 @@ function create_default_slot(ctx) {
       }
     }
   });
-  inputgroup1 = new _inputs_InputGroup_svelte__WEBPACK_IMPORTED_MODULE_9__["default"]({
+  inputgroup1 = new _inputs_InputGroup_svelte__WEBPACK_IMPORTED_MODULE_6__["default"]({
     props: {
       $$slots: {
         "default": [create_default_slot_3]
@@ -10454,7 +8894,7 @@ function create_default_slot(ctx) {
       }
     }
   });
-  inputgroup2 = new _inputs_InputGroup_svelte__WEBPACK_IMPORTED_MODULE_9__["default"]({
+  inputgroup2 = new _inputs_InputGroup_svelte__WEBPACK_IMPORTED_MODULE_6__["default"]({
     props: {
       $$slots: {
         "default": [create_default_slot_2]
@@ -10464,7 +8904,7 @@ function create_default_slot(ctx) {
       }
     }
   });
-  inputgroup3 = new _inputs_InputGroup_svelte__WEBPACK_IMPORTED_MODULE_9__["default"]({
+  inputgroup3 = new _inputs_InputGroup_svelte__WEBPACK_IMPORTED_MODULE_6__["default"]({
     props: {
       $$slots: {
         "default": [create_default_slot_1]
@@ -10474,95 +8914,63 @@ function create_default_slot(ctx) {
       }
     }
   });
-
-  function formalert_open_binding(value) {
-    /*formalert_open_binding*/
-    ctx[21](value);
-  }
-
-  function formalert_text_binding(value) {
-    /*formalert_text_binding*/
-    ctx[22](value);
-  }
-
-  var formalert_props = {};
-
-  if (
-  /*errorOpen*/
-  ctx[2] !== void 0) {
-    formalert_props.open =
-    /*errorOpen*/
-    ctx[2];
-  }
-
-  if (
-  /*errorMessage*/
-  ctx[3] !== void 0) {
-    formalert_props.text =
-    /*errorMessage*/
-    ctx[3];
-  }
-
-  formalert = new _display_FormAlert_svelte__WEBPACK_IMPORTED_MODULE_10__["default"]({
-    props: formalert_props
-  });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(formalert, 'open', formalert_open_binding);
-  });
-  svelte_internal__WEBPACK_IMPORTED_MODULE_1__.binding_callbacks.push(function () {
-    return (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.bind)(formalert, 'text', formalert_text_binding);
-  });
-  button = new _buttons_Button_svelte__WEBPACK_IMPORTED_MODULE_14__["default"]({
+  button = new _buttons_Button_svelte__WEBPACK_IMPORTED_MODULE_11__["default"]({
     props: {
       text: "Sign up",
-      type: "submit"
+      type: "submit",
+      disabled:
+      /*$form*/
+      ctx[0].processing
     }
   });
+  var if_block =
+  /*$form*/
+  ctx[0].hasErrors && create_if_block(ctx);
   return {
     c: function c() {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(formlogo.$$.fragment);
-      t0 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(formheader.$$.fragment);
-      t1 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(socialbuttongroup.$$.fragment);
-      t2 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(formdivider.$$.fragment);
-      t3 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(inputgroup0.$$.fragment);
-      t4 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(inputgroup1.$$.fragment);
-      t5 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(inputgroup2.$$.fragment);
-      t6 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
-      div = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.element)("div");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(inputgroup3.$$.fragment);
-      t7 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(formalert.$$.fragment);
-      t8 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(button.$$.fragment);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(div, "class", "flex flex-col gap-y-4");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(formlogo.$$.fragment);
+      t0 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(formheader.$$.fragment);
+      t1 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(socialbuttongroup.$$.fragment);
+      t2 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(formdivider.$$.fragment);
+      t3 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(inputgroup0.$$.fragment);
+      t4 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(inputgroup1.$$.fragment);
+      t5 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(inputgroup2.$$.fragment);
+      t6 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      div = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("div");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(inputgroup3.$$.fragment);
+      t7 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(button.$$.fragment);
+      t8 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
+      if (if_block) if_block.c();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div, "class", "flex flex-col gap-y-4");
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(formlogo, target, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, t0, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(formheader, target, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, t1, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(socialbuttongroup, target, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, t2, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(formdivider, target, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, t3, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(inputgroup0, target, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, t4, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(inputgroup1, target, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, t5, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(inputgroup2, target, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, t6, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.insert)(target, div, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(inputgroup3, div, null);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.append)(div, t7);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(formalert, div, null);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.append)(div, t8);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(button, div, null);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(formlogo, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t0, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(formheader, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t1, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(socialbuttongroup, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t2, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(formdivider, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t3, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(inputgroup0, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t4, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(inputgroup1, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t5, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(inputgroup2, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t6, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, div, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(inputgroup3, div, null);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div, t7);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(button, div, null);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div, t8);
+      if (if_block) if_block.m(div, null);
       current = true;
     },
     p: function p(ctx, dirty) {
@@ -10570,7 +8978,7 @@ function create_default_slot(ctx) {
 
       if (dirty &
       /*$$scope*/
-      16777216) {
+      262144) {
         formheader_changes.$$scope = {
           dirty: dirty,
           ctx: ctx
@@ -10581,8 +8989,8 @@ function create_default_slot(ctx) {
       var inputgroup0_changes = {};
 
       if (dirty &
-      /*$$scope, formData, inputErrors*/
-      16777219) {
+      /*$$scope, $form*/
+      262145) {
         inputgroup0_changes.$$scope = {
           dirty: dirty,
           ctx: ctx
@@ -10593,8 +9001,8 @@ function create_default_slot(ctx) {
       var inputgroup1_changes = {};
 
       if (dirty &
-      /*$$scope, formData, inputErrors*/
-      16777219) {
+      /*$$scope, $form*/
+      262145) {
         inputgroup1_changes.$$scope = {
           dirty: dirty,
           ctx: ctx
@@ -10605,8 +9013,8 @@ function create_default_slot(ctx) {
       var inputgroup2_changes = {};
 
       if (dirty &
-      /*$$scope, formData, inputErrors*/
-      16777219) {
+      /*$$scope, $form*/
+      262145) {
         inputgroup2_changes.$$scope = {
           dirty: dirty,
           ctx: ctx
@@ -10617,8 +9025,8 @@ function create_default_slot(ctx) {
       var inputgroup3_changes = {};
 
       if (dirty &
-      /*$$scope, formData*/
-      16777217) {
+      /*$$scope, $form*/
+      262145) {
         inputgroup3_changes.$$scope = {
           dirty: dirty,
           ctx: ctx
@@ -10626,92 +9034,97 @@ function create_default_slot(ctx) {
       }
 
       inputgroup3.$set(inputgroup3_changes);
-      var formalert_changes = {};
+      var button_changes = {};
+      if (dirty &
+      /*$form*/
+      1) button_changes.disabled =
+      /*$form*/
+      ctx[0].processing;
+      button.$set(button_changes);
 
-      if (!updating_open && dirty &
-      /*errorOpen*/
-      4) {
-        updating_open = true;
-        formalert_changes.open =
-        /*errorOpen*/
-        ctx[2];
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
-          return updating_open = false;
+      if (
+      /*$form*/
+      ctx[0].hasErrors) {
+        if (if_block) {
+          if_block.p(ctx, dirty);
+
+          if (dirty &
+          /*$form*/
+          1) {
+            (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block, 1);
+          }
+        } else {
+          if_block = create_if_block(ctx);
+          if_block.c();
+          (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block, 1);
+          if_block.m(div, null);
+        }
+      } else if (if_block) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block, 1, 1, function () {
+          if_block = null;
         });
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
       }
-
-      if (!updating_text && dirty &
-      /*errorMessage*/
-      8) {
-        updating_text = true;
-        formalert_changes.text =
-        /*errorMessage*/
-        ctx[3];
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
-          return updating_text = false;
-        });
-      }
-
-      formalert.$set(formalert_changes);
     },
     i: function i(local) {
       if (current) return;
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(formlogo.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(formheader.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(socialbuttongroup.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(formdivider.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(inputgroup0.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(inputgroup1.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(inputgroup2.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(inputgroup3.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(formalert.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(button.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(formlogo.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(formheader.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(socialbuttongroup.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(formdivider.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(inputgroup0.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(inputgroup1.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(inputgroup2.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(inputgroup3.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(button.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block);
       current = true;
     },
     o: function o(local) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(formlogo.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(formheader.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(socialbuttongroup.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(formdivider.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(inputgroup0.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(inputgroup1.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(inputgroup2.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(inputgroup3.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(formalert.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(button.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(formlogo.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(formheader.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(socialbuttongroup.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(formdivider.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(inputgroup0.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(inputgroup1.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(inputgroup2.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(inputgroup3.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(button.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block);
       current = false;
     },
     d: function d(detaching) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(formlogo, detaching);
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(t0);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(formheader, detaching);
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(t1);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(socialbuttongroup, detaching);
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(t2);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(formdivider, detaching);
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(t3);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(inputgroup0, detaching);
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(t4);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(inputgroup1, detaching);
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(t5);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(inputgroup2, detaching);
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(t6);
-      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(div);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(inputgroup3);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(formalert);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(button);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(formlogo, detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t0);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(formheader, detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t1);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(socialbuttongroup, detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t2);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(formdivider, detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t3);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(inputgroup0, detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t4);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(inputgroup1, detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t5);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(inputgroup2, detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t6);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(div);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(inputgroup3);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(button);
+      if (if_block) if_block.d();
     }
   };
 }
 
 function create_fragment(ctx) {
-  var form;
+  var form_1;
   var current;
-  form = new _basics_Form_svelte__WEBPACK_IMPORTED_MODULE_13__["default"]({
+  form_1 = new _basics_Form_svelte__WEBPACK_IMPORTED_MODULE_10__["default"]({
     props: {
       handleSubmit:
       /*handleSubmit*/
-      ctx[5],
+      ctx[3],
       $$slots: {
         "default": [create_default_slot]
       },
@@ -10722,66 +9135,60 @@ function create_fragment(ctx) {
   });
   return {
     c: function c() {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_component)(form.$$.fragment);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(form_1.$$.fragment);
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(form, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(form_1, target, anchor);
       current = true;
     },
     p: function p(ctx, _ref) {
       var _ref2 = _slicedToArray(_ref, 1),
           dirty = _ref2[0];
 
-      var form_changes = {};
+      var form_1_changes = {};
 
       if (dirty &
-      /*$$scope, errorOpen, errorMessage, formData, inputErrors*/
-      16777231) {
-        form_changes.$$scope = {
+      /*$$scope, $form*/
+      262145) {
+        form_1_changes.$$scope = {
           dirty: dirty,
           ctx: ctx
         };
       }
 
-      form.$set(form_changes);
+      form_1.$set(form_1_changes);
     },
     i: function i(local) {
       if (current) return;
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(form.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(form_1.$$.fragment, local);
       current = true;
     },
     o: function o(local) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(form.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(form_1.$$.fragment, local);
       current = false;
     },
     d: function d(detaching) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(form, detaching);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(form_1, detaching);
     }
   };
 }
 
 function instance($$self, $$props, $$invalidate) {
-  var formData = {
+  var $form;
+  var form = (0,_inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_1__.useForm)({
     name: '',
     last_name: '',
     email: '',
     password: '',
     password_confirmation: '',
     tutor_cpf: '',
-    vet_crmv: ''
-  };
-  var inputErrors = {
-    name: false,
-    last_name: false,
-    email: false,
-    password: false,
-    password_confirmation: false,
-    tutor_cpf: false,
-    vet_crmv: false,
-    type: 'TUTOR'
-  };
-  var errorOpen = false;
-  var errorMessage = ''; // const
+    vet_crmv: '',
+    type: 'TUTOR',
+    remember: false
+  });
+  (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.component_subscribe)($$self, form, function (value) {
+    return $$invalidate(0, $form = value);
+  }); // const
 
   var inputOptions = [{
     value: 'TUTOR',
@@ -10791,171 +9198,110 @@ function instance($$self, $$props, $$invalidate) {
     text: 'Veterinarian'
   }]; // methods
 
-  var handleErrors = function handleErrors(errorData) {
-    $$invalidate(2, errorOpen = errorData ? true : false);
-    $$invalidate(1, inputErrors.name = 'name' in errorData ? true : false, inputErrors);
-    $$invalidate(1, inputErrors.last_name = 'last_name' in errorData ? true : false, inputErrors);
-    $$invalidate(1, inputErrors.email = 'email' in errorData ? true : false, inputErrors);
-    $$invalidate(1, inputErrors.password = 'password' in errorData ? true : false, inputErrors);
-    $$invalidate(1, inputErrors.tutor_cpf = 'tutor_cpf' in errorData ? true : false, inputErrors);
-    $$invalidate(1, inputErrors.vet_crmv = 'vet_crmv' in errorData ? true : false, inputErrors);
-  }; // TODO: use Inertia only
-
-
-  var handleSubmit = /*#__PURE__*/function () {
-    var _ref3 = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var resp;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              _context.prev = 0;
-              _context.next = 3;
-              return axios__WEBPACK_IMPORTED_MODULE_2___default().post('/register', formData, _config_axios__WEBPACK_IMPORTED_MODULE_15__.config);
-
-            case 3:
-              resp = _context.sent;
-              resp.status === 200 && _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_4__.Inertia.reload();
-              handleErrors(null);
-              _context.next = 13;
-              break;
-
-            case 8:
-              _context.prev = 8;
-              _context.t0 = _context["catch"](0);
-              $$invalidate(3, errorMessage = _context.t0.response.data.message);
-              console.log(_context.t0.response.data.errors);
-              handleErrors(_context.t0.response.data.errors);
-
-            case 13:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, _callee, null, [[0, 8]]);
-    }));
-
-    return function handleSubmit() {
-      return _ref3.apply(this, arguments);
-    };
-  }();
-
-  function forminput0_value_binding(value) {
-    if ($$self.$$.not_equal(formData.name, value)) {
-      formData.name = value;
-      $$invalidate(0, formData);
-    }
-  }
-
-  function forminput0_error_binding(value) {
-    if ($$self.$$.not_equal(inputErrors.name, value)) {
-      inputErrors.name = value;
-      $$invalidate(1, inputErrors);
-    }
-  }
-
-  function forminput1_value_binding(value) {
-    if ($$self.$$.not_equal(formData.last_name, value)) {
-      formData.last_name = value;
-      $$invalidate(0, formData);
-    }
-  }
-
-  function forminput1_error_binding(value) {
-    if ($$self.$$.not_equal(inputErrors.last_name, value)) {
-      inputErrors.last_name = value;
-      $$invalidate(1, inputErrors);
-    }
-  }
+  var handleSubmit = function handleSubmit() {
+    $form.clearErrors();
+    $form.post('/register');
+  };
 
   function forminput_value_binding(value) {
-    if ($$self.$$.not_equal(formData.email, value)) {
-      formData.email = value;
-      $$invalidate(0, formData);
-    }
-  }
-
-  function forminput_error_binding(value) {
-    if ($$self.$$.not_equal(inputErrors.email, value)) {
-      inputErrors.email = value;
-      $$invalidate(1, inputErrors);
+    if ($$self.$$.not_equal($form.name, value)) {
+      $form.name = value;
+      form.set($form);
     }
   }
 
   function forminput_value_binding_1(value) {
-    if ($$self.$$.not_equal(formData.tutor_cpf, value)) {
-      formData.tutor_cpf = value;
-      $$invalidate(0, formData);
-    }
-  }
-
-  function forminput_error_binding_1(value) {
-    if ($$self.$$.not_equal(inputErrors.tutor_cpf, value)) {
-      inputErrors.tutor_cpf = value;
-      $$invalidate(1, inputErrors);
+    if ($$self.$$.not_equal($form.name, value)) {
+      $form.name = value;
+      form.set($form);
     }
   }
 
   function forminput_value_binding_2(value) {
-    if ($$self.$$.not_equal(formData.vet_crmv, value)) {
-      formData.vet_crmv = value;
-      $$invalidate(0, formData);
+    if ($$self.$$.not_equal($form.last_name, value)) {
+      $form.last_name = value;
+      form.set($form);
     }
   }
 
-  function forminput_error_binding_2(value) {
-    if ($$self.$$.not_equal(inputErrors.vet_crmv, value)) {
-      inputErrors.vet_crmv = value;
-      $$invalidate(1, inputErrors);
+  function forminput_value_binding_3(value) {
+    if ($$self.$$.not_equal($form.last_name, value)) {
+      $form.last_name = value;
+      form.set($form);
     }
   }
 
-  function forminput0_value_binding_1(value) {
-    if ($$self.$$.not_equal(formData.password, value)) {
-      formData.password = value;
-      $$invalidate(0, formData);
+  function forminput_value_binding_4(value) {
+    if ($$self.$$.not_equal($form.email, value)) {
+      $form.email = value;
+      form.set($form);
     }
   }
 
-  function forminput0_error_binding_1(value) {
-    if ($$self.$$.not_equal(inputErrors.password, value)) {
-      inputErrors.password = value;
-      $$invalidate(1, inputErrors);
+  function forminput_value_binding_5(value) {
+    if ($$self.$$.not_equal($form.email, value)) {
+      $form.email = value;
+      form.set($form);
     }
   }
 
-  function forminput1_value_binding_1(value) {
-    if ($$self.$$.not_equal(formData.password_confirmation, value)) {
-      formData.password_confirmation = value;
-      $$invalidate(0, formData);
+  function forminput_value_binding_6(value) {
+    if ($$self.$$.not_equal($form.tutor_cpf, value)) {
+      $form.tutor_cpf = value;
+      form.set($form);
     }
   }
 
-  function forminput1_error_binding_1(value) {
-    if ($$self.$$.not_equal(inputErrors.password_confirmation, value)) {
-      inputErrors.password_confirmation = value;
-      $$invalidate(1, inputErrors);
+  function forminput_value_binding_7(value) {
+    if ($$self.$$.not_equal($form.tutor_cpf, value)) {
+      $form.tutor_cpf = value;
+      form.set($form);
+    }
+  }
+
+  function forminput_value_binding_8(value) {
+    if ($$self.$$.not_equal($form.vet_crmv, value)) {
+      $form.vet_crmv = value;
+      form.set($form);
+    }
+  }
+
+  function forminput_value_binding_9(value) {
+    if ($$self.$$.not_equal($form.vet_crmv, value)) {
+      $form.vet_crmv = value;
+      form.set($form);
+    }
+  }
+
+  function forminput_value_binding_10(value) {
+    if ($$self.$$.not_equal($form.password, value)) {
+      $form.password = value;
+      form.set($form);
+    }
+  }
+
+  function forminput_value_binding_11(value) {
+    if ($$self.$$.not_equal($form.password, value)) {
+      $form.password = value;
+      form.set($form);
+    }
+  }
+
+  function forminput_value_binding_12(value) {
+    if ($$self.$$.not_equal($form.password_confirmation, value)) {
+      $form.password_confirmation = value;
+      form.set($form);
     }
   }
 
   function forminputselect_value_binding(value) {
-    if ($$self.$$.not_equal(formData.type, value)) {
-      formData.type = value;
-      $$invalidate(0, formData);
+    if ($$self.$$.not_equal($form.type, value)) {
+      $form.type = value;
+      form.set($form);
     }
   }
 
-  function formalert_open_binding(value) {
-    errorOpen = value;
-    $$invalidate(2, errorOpen);
-  }
-
-  function formalert_text_binding(value) {
-    errorMessage = value;
-    $$invalidate(3, errorMessage);
-  }
-
-  return [formData, inputErrors, errorOpen, errorMessage, inputOptions, handleSubmit, forminput0_value_binding, forminput0_error_binding, forminput1_value_binding, forminput1_error_binding, forminput_value_binding, forminput_error_binding, forminput_value_binding_1, forminput_error_binding_1, forminput_value_binding_2, forminput_error_binding_2, forminput0_value_binding_1, forminput0_error_binding_1, forminput1_value_binding_1, forminput1_error_binding_1, forminputselect_value_binding, formalert_open_binding, formalert_text_binding];
+  return [$form, form, inputOptions, handleSubmit, forminput_value_binding, forminput_value_binding_1, forminput_value_binding_2, forminput_value_binding_3, forminput_value_binding_4, forminput_value_binding_5, forminput_value_binding_6, forminput_value_binding_7, forminput_value_binding_8, forminput_value_binding_9, forminput_value_binding_10, forminput_value_binding_11, forminput_value_binding_12, forminputselect_value_binding];
 }
 
 var RegisterForm = /*#__PURE__*/function (_SvelteComponent) {
@@ -10969,12 +9315,12 @@ var RegisterForm = /*#__PURE__*/function (_SvelteComponent) {
     _classCallCheck(this, RegisterForm);
 
     _this = _super.call(this);
-    (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.init)(_assertThisInitialized(_this), options, instance, create_fragment, svelte_internal__WEBPACK_IMPORTED_MODULE_1__.safe_not_equal, {});
+    (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.init)(_assertThisInitialized(_this), options, instance, create_fragment, svelte_internal__WEBPACK_IMPORTED_MODULE_0__.safe_not_equal, {});
     return _this;
   }
 
   return _createClass(RegisterForm);
-}(svelte_internal__WEBPACK_IMPORTED_MODULE_1__.SvelteComponent);
+}(svelte_internal__WEBPACK_IMPORTED_MODULE_0__.SvelteComponent);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (RegisterForm);
 
@@ -12628,28 +10974,6 @@ _inertiajs_progress__WEBPACK_IMPORTED_MODULE_1__.InertiaProgress.init();
     });
   }
 });
-
-/***/ }),
-
-/***/ "./resources/js/config/axios.js":
-/*!**************************************!*\
-  !*** ./resources/js/config/axios.js ***!
-  \**************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "config": () => (/* binding */ config)
-/* harmony export */ });
-var config = {
-  baseURL: 'http://localhost:8000',
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json'
-  }
-};
 
 /***/ }),
 

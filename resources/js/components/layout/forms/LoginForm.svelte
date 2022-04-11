@@ -80,12 +80,12 @@
   <LoginFormExtra bind:checked={$form.remember} />
 
   <div class="flex flex-col gap-y-4">
+    <!-- submit button -->
+    <Button text="Sign in" type="submit" disabled={$form.processing} />
     <!-- error output -->
     {#if $form.hasErrors}
       <FormAlert open={true} text={handleFormErrorMessage($form.errors)} />
     {/if}
-    <!-- submit button -->
-    <Button text="Sign in" type="submit" disabled={$form.processing} />
   </div>
 </Form>
 

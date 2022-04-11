@@ -12556,7 +12556,7 @@ var handleFormErrorMessage = function handleFormErrorMessage(errors) {
   if (errorCount <= 1) {
     return Object.values(errors)[0];
   } else {
-    return "".concat(Object.values(errors)[0], " (and ").concat(errorCount, " more errors)");
+    return "".concat(Object.values(errors)[0], " (and ").concat(errorCount - 1, " more ").concat(errorCount - 1 > 1 ? 'errors' : 'error', ")");
   }
 };
 

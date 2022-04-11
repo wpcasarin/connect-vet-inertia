@@ -3,6 +3,8 @@ export const handleFormErrorMessage = (errors) => {
   if (errorCount <= 1) {
     return Object.values(errors)[0];
   } else {
-    return `${Object.values(errors)[0]} (and ${errorCount} more errors)`;
+    return `${Object.values(errors)[0]} (and ${errorCount - 1} more ${
+      errorCount - 1 > 1 ? 'errors' : 'error'
+    })`;
   }
 };

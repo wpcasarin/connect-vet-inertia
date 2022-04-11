@@ -62,102 +62,58 @@
   <!-- input group 1 -->
   <InputGroup>
     <!-- name input -->
-    {#if $form.errors.name}
-      <FormInput
-        type="text"
-        label="name"
-        placeholder="John"
-        error={true}
-        bind:value={$form.name} />
-    {:else}
-      <FormInput
-        type="text"
-        label="name"
-        placeholder="John"
-        bind:value={$form.name} />
-    {/if}
+    <FormInput
+      type="text"
+      label="name"
+      placeholder="John"
+      error={$form.errors.name ? true : false}
+      bind:value={$form.name} />
     <!-- last name input -->
-    {#if $form.errors.last_name}
-      <FormInput
-        type="text"
-        label="last name"
-        placeholder="Doe"
-        error={true}
-        bind:value={$form.last_name} />
-    {:else}
-      <FormInput
-        type="text"
-        label="last name"
-        placeholder="Doe"
-        bind:value={$form.last_name} />
-    {/if}
+    <FormInput
+      type="text"
+      label="last name"
+      placeholder="Doe"
+      error={$form.errors.last_name ? true : false}
+      bind:value={$form.last_name} />
   </InputGroup>
   <!-- input group 2 -->
   <InputGroup>
     <!-- email input -->
-    {#if $form.errors.email}
-      <FormInput
-        type="email"
-        label="email address"
-        placeholder="john.doe@mail.com"
-        error={true}
-        bind:value={$form.email} />
-    {:else}
-      <FormInput
-        type="email"
-        label="email address"
-        placeholder="john.doe@mail.com"
-        bind:value={$form.email} />
-    {/if}
+    <FormInput
+      type="email"
+      label="email address"
+      placeholder="john.doe@mail.com"
+      error={$form.errors.email ? true : false}
+      bind:value={$form.email} />
 
     <!-- unique field -->
     {#if $form.type === 'TUTOR'}
-      {#if $form.errors.tutor_cpf}
-        <FormInput
-          type="text"
-          label="CPF"
-          placeholder="000.000.000-00"
-          error={true}
-          bind:value={$form.tutor_cpf} />
-      {:else}
-        <FormInput
-          type="text"
-          label="CPF"
-          placeholder="000.000.000-00"
-          bind:value={$form.tutor_cpf} />
-      {/if}
-    {:else if $form.errors.vet_crmv}
       <FormInput
         type="text"
-        label="CRMV"
-        placeholder="0000-00"
-        error={true}
-        bind:value={$form.vet_crmv} />
+        label="CPF"
+        placeholder="000.000.000-00"
+        error={$form.errors.tutor_cpf ? true : false}
+        bind:value={$form.tutor_cpf} />
     {:else}
       <FormInput
         type="text"
         label="CRMV"
         placeholder="0000-00"
+        error={$form.errors.vet_crmv ? true : false}
         bind:value={$form.vet_crmv} />
     {/if}
   </InputGroup>
   <!-- input group 3 -->
   <InputGroup>
     <!-- password input -->
-    {#if $form.errors.password}
-      <FormInput
-        type="password"
-        label="password"
-        placeholder="******"
-        error={true}
-        bind:value={$form.password} />
-    {:else}
-      <FormInput
-        type="password"
-        label="password"
-        placeholder="******"
-        bind:value={$form.password} />
-    {/if}
+
+    <FormInput
+      type="password"
+      label="password"
+      placeholder="******"
+      error={$form.errors.password ? true : false}
+      bind:value={$form.password} />
+
     <!-- confirm password input -->
     <FormInput
       type="password"
@@ -176,9 +132,9 @@
     <!-- submit button -->
     <Button text="Sign up" type="submit" disabled={$form.processing} />
     <!-- error output -->
-    {#if $form.hasErrors}
-      <FormAlert open={true} text={handleFormErrorMessage($form.errors)} />
-    {/if}
+    <FormAlert
+      open={$form.hasErrors ? true : false}
+      text={handleFormErrorMessage($form.errors)} />
   </div>
 </Form>
 

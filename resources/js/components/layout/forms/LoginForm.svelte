@@ -43,37 +43,21 @@
   <FormDivider text="Or continue with" />
   <!-- email input -->
   <InputGroup>
-    {#if $form.errors.email}
-      <FormInput
-        type="email"
-        label="email address"
-        placeholder="john.doe@mail.com"
-        error={true}
-        bind:value={$form.email} />
-    {:else}
-      <FormInput
-        type="email"
-        label="email address"
-        placeholder="john.doe@mail.com"
-        bind:value={$form.email} />
-    {/if}
+    <FormInput
+      type="email"
+      label="email address"
+      placeholder="john.doe@mail.com"
+      error={$form.errors.email ? true : false}
+      bind:value={$form.email} />
   </InputGroup>
   <!-- password input -->
   <InputGroup>
-    {#if $form.errors.password}
-      <FormInput
-        type="password"
-        label="password"
-        placeholder="******"
-        error={true}
-        bind:value={$form.password} />
-    {:else}
-      <FormInput
-        type="password"
-        label="password"
-        placeholder="******"
-        bind:value={$form.password} />
-    {/if}
+    <FormInput
+      type="password"
+      label="password"
+      placeholder="******"
+      error={$form.errors.password ? true : false}
+      bind:value={$form.password} />
   </InputGroup>
 
   <!-- extra options -->

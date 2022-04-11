@@ -36,7 +36,7 @@
         {#if !user}
           <ul class="hidden space-x-4 sm:flex">
             <NavBarLink to="/login" text="login" />
-            <NavBarLink to="/register" text="register" />
+            <NavBarLink to="/register" text="register" accent={true} />
           </ul>
         {/if}
 

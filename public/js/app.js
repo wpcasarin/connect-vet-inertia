@@ -5232,6 +5232,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 function create_else_block(ctx) {
   var button;
   var t;
+  var button_class_value;
   var inertia_action;
   var mounted;
   var dispose;
@@ -5241,7 +5242,11 @@ function create_else_block(ctx) {
       t = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.text)(
       /*text*/
       ctx[0]);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(button, "class", "capitalize rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(button, "class", button_class_value = "rounded-md px-3 py-2 text-sm font-medium capitalize hover:bg-gray-700 hover:text-white \n  ".concat(
+      /*$page*/
+      ctx[4].url ===
+      /*to*/
+      ctx[1] ? 'bg-gray-900 text-white' : 'text-gray-300'));
     },
     m: function m(target, anchor) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, button, anchor);
@@ -5265,6 +5270,17 @@ function create_else_block(ctx) {
       1) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.set_data)(t,
       /*text*/
       ctx[0]);
+
+      if (dirty &
+      /*$page, to*/
+      18 && button_class_value !== (button_class_value = "rounded-md px-3 py-2 text-sm font-medium capitalize hover:bg-gray-700 hover:text-white \n  ".concat(
+      /*$page*/
+      ctx[4].url ===
+      /*to*/
+      ctx[1] ? 'bg-gray-900 text-white' : 'text-gray-300'))) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(button, "class", button_class_value);
+      }
+
       if (inertia_action && (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.is_function)(inertia_action.update) && dirty &
       /*to, method*/
       6) inertia_action.update.call(null, {
@@ -5282,12 +5298,13 @@ function create_else_block(ctx) {
       dispose();
     }
   };
-} // (11:2) {#if $page.url === to}
+} // (12:2) {#if accent}
 
 
 function create_if_block(ctx) {
   var button;
   var t;
+  var button_class_value;
   var inertia_action;
   var mounted;
   var dispose;
@@ -5297,7 +5314,11 @@ function create_if_block(ctx) {
       t = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.text)(
       /*text*/
       ctx[0]);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(button, "class", "rounded-md bg-gray-900 px-3 py-2 text-sm font-medium capitalize text-white hover:bg-gray-700 hover:text-white");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(button, "class", button_class_value = "rounded-md bg-primary-focus px-3 py-2 text-sm font-medium capitalize text-white hover:bg-indigo-800\n    ".concat(
+      /*$page*/
+      ctx[4].url ===
+      /*to*/
+      ctx[1] && 'bg-indigo-100 text-primary-focus hover:bg-indigo-200'));
     },
     m: function m(target, anchor) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, button, anchor);
@@ -5321,6 +5342,17 @@ function create_if_block(ctx) {
       1) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.set_data)(t,
       /*text*/
       ctx[0]);
+
+      if (dirty &
+      /*$page, to*/
+      18 && button_class_value !== (button_class_value = "rounded-md bg-primary-focus px-3 py-2 text-sm font-medium capitalize text-white hover:bg-indigo-800\n    ".concat(
+      /*$page*/
+      ctx[4].url ===
+      /*to*/
+      ctx[1] && 'bg-indigo-100 text-primary-focus hover:bg-indigo-200'))) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(button, "class", button_class_value);
+      }
+
       if (inertia_action && (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.is_function)(inertia_action.update) && dirty &
       /*to, method*/
       6) inertia_action.update.call(null, {
@@ -5345,10 +5377,8 @@ function create_fragment(ctx) {
 
   function select_block_type(ctx, dirty) {
     if (
-    /*$page*/
-    ctx[3].url ===
-    /*to*/
-    ctx[1]) return create_if_block;
+    /*accent*/
+    ctx[3]) return create_if_block;
     return create_else_block;
   }
 
@@ -5392,7 +5422,7 @@ function create_fragment(ctx) {
 function instance($$self, $$props, $$invalidate) {
   var $page;
   (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.component_subscribe)($$self, _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_1__.page, function ($$value) {
-    return $$invalidate(3, $page = $$value);
+    return $$invalidate(4, $page = $$value);
   });
   var _$$props$text = $$props.text,
       text = _$$props$text === void 0 ? 'Link' : _$$props$text;
@@ -5400,14 +5430,17 @@ function instance($$self, $$props, $$invalidate) {
       to = _$$props$to === void 0 ? '/' : _$$props$to;
   var _$$props$method = $$props.method,
       method = _$$props$method === void 0 ? 'get' : _$$props$method;
+  var _$$props$accent = $$props.accent,
+      accent = _$$props$accent === void 0 ? false : _$$props$accent;
 
   $$self.$$set = function ($$props) {
     if ('text' in $$props) $$invalidate(0, text = $$props.text);
     if ('to' in $$props) $$invalidate(1, to = $$props.to);
     if ('method' in $$props) $$invalidate(2, method = $$props.method);
+    if ('accent' in $$props) $$invalidate(3, accent = $$props.accent);
   };
 
-  return [text, to, method, $page];
+  return [text, to, method, accent, $page];
 }
 
 var NavBarLink = /*#__PURE__*/function (_SvelteComponent) {
@@ -5424,7 +5457,8 @@ var NavBarLink = /*#__PURE__*/function (_SvelteComponent) {
     (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.init)(_assertThisInitialized(_this), options, instance, create_fragment, svelte_internal__WEBPACK_IMPORTED_MODULE_0__.safe_not_equal, {
       text: 0,
       to: 1,
-      method: 2
+      method: 2,
+      accent: 3
     });
     return _this;
   }
@@ -7208,7 +7242,8 @@ function create_if_block_1(ctx) {
   navbarlink1 = new _buttons_NavBarLink_svelte__WEBPACK_IMPORTED_MODULE_1__["default"]({
     props: {
       to: "/register",
-      text: "register"
+      text: "register",
+      accent: true
     }
   });
   return {

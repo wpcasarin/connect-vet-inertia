@@ -11,6 +11,7 @@
   import FormLogo from '../../logos/FormLogo.svelte';
   import Form from '../../basics/Form.svelte';
   import Button from '../../buttons/Button.svelte';
+  import { handleFormErrorMessage } from '../../../util';
   // states
   let form = useForm({
     email: '',
@@ -21,14 +22,6 @@
   const handleSubmit = () => {
     $form.clearErrors();
     $form.post('/login');
-  };
-  const handleErrorMessage = (errors) => {
-    const errorCount = Object.keys(errors).length;
-    if (errorCount <= 1) {
-      return Object.values(errors)[0];
-    } else {
-      return `${Object.values(errors)[0]} (and ${errorCount} more errors)`;
-    }
   };
 </script>
 
@@ -89,7 +82,7 @@
   <div class="flex flex-col gap-y-4">
     <!-- error output -->
     {#if $form.hasErrors}
-      <FormAlert open="{true}" text="{handleErrorMessage($form.errors)}" />
+      <FormAlert open="{true}" text="{handleFormErrorMessage($form.errors)}" />
     {/if}
     <!-- submit button -->
     <Button text="Sign in" type="submit" />

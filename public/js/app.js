@@ -8505,6 +8505,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _logos_FormLogo_svelte__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../logos/FormLogo.svelte */ "./resources/js/components/logos/FormLogo.svelte");
 /* harmony import */ var _basics_Form_svelte__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../basics/Form.svelte */ "./resources/js/components/basics/Form.svelte");
 /* harmony import */ var _buttons_Button_svelte__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../buttons/Button.svelte */ "./resources/js/components/buttons/Button.svelte");
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../../util */ "./resources/js/util/index.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -8554,6 +8555,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+
 function create_default_slot_3(ctx) {
   var p;
   var t0;
@@ -8588,7 +8590,7 @@ function create_default_slot_3(ctx) {
       dispose();
     }
   };
-} // (60:4) {:else}
+} // (53:4) {:else}
 
 
 function create_else_block_1(ctx) {
@@ -8598,7 +8600,7 @@ function create_else_block_1(ctx) {
 
   function forminput_value_binding_1(value) {
     /*forminput_value_binding_1*/
-    ctx[5](value);
+    ctx[4](value);
   }
 
   var forminput_props = {
@@ -8659,7 +8661,7 @@ function create_else_block_1(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
     }
   };
-} // (53:4) {#if $form.errors.email}
+} // (46:4) {#if $form.errors.email}
 
 
 function create_if_block_2(ctx) {
@@ -8669,7 +8671,7 @@ function create_if_block_2(ctx) {
 
   function forminput_value_binding(value) {
     /*forminput_value_binding*/
-    ctx[4](value);
+    ctx[3](value);
   }
 
   var forminput_props = {
@@ -8731,7 +8733,7 @@ function create_if_block_2(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
     }
   };
-} // (52:2) <InputGroup>
+} // (45:2) <InputGroup>
 
 
 function create_default_slot_2(ctx) {
@@ -8800,7 +8802,7 @@ function create_default_slot_2(ctx) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(if_block_anchor);
     }
   };
-} // (77:4) {:else}
+} // (70:4) {:else}
 
 
 function create_else_block(ctx) {
@@ -8810,7 +8812,7 @@ function create_else_block(ctx) {
 
   function forminput_value_binding_3(value) {
     /*forminput_value_binding_3*/
-    ctx[7](value);
+    ctx[6](value);
   }
 
   var forminput_props = {
@@ -8871,7 +8873,7 @@ function create_else_block(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
     }
   };
-} // (70:4) {#if $form.errors.password}
+} // (63:4) {#if $form.errors.password}
 
 
 function create_if_block_1(ctx) {
@@ -8881,7 +8883,7 @@ function create_if_block_1(ctx) {
 
   function forminput_value_binding_2(value) {
     /*forminput_value_binding_2*/
-    ctx[6](value);
+    ctx[5](value);
   }
 
   var forminput_props = {
@@ -8943,7 +8945,7 @@ function create_if_block_1(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(forminput, detaching);
     }
   };
-} // (69:2) <InputGroup>
+} // (62:2) <InputGroup>
 
 
 function create_default_slot_1(ctx) {
@@ -9012,7 +9014,7 @@ function create_default_slot_1(ctx) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(if_block_anchor);
     }
   };
-} // (91:4) {#if $form.hasErrors}
+} // (84:4) {#if $form.hasErrors}
 
 
 function create_if_block(ctx) {
@@ -9021,9 +9023,7 @@ function create_if_block(ctx) {
   formalert = new _display_FormAlert_svelte__WEBPACK_IMPORTED_MODULE_7__["default"]({
     props: {
       open: true,
-      text:
-      /*handleErrorMessage*/
-      ctx[3](
+      text: (0,_util__WEBPACK_IMPORTED_MODULE_12__.handleFormErrorMessage)(
       /*$form*/
       ctx[0].errors)
     }
@@ -9040,9 +9040,7 @@ function create_if_block(ctx) {
       var formalert_changes = {};
       if (dirty &
       /*$form*/
-      1) formalert_changes.text =
-      /*handleErrorMessage*/
-      ctx[3](
+      1) formalert_changes.text = (0,_util__WEBPACK_IMPORTED_MODULE_12__.handleFormErrorMessage)(
       /*$form*/
       ctx[0].errors);
       formalert.$set(formalert_changes);
@@ -9060,7 +9058,7 @@ function create_if_block(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(formalert, detaching);
     }
   };
-} // (35:0) <Form handleSubmit="{handleSubmit}">
+} // (28:0) <Form handleSubmit="{handleSubmit}">
 
 
 function create_default_slot(ctx) {
@@ -9128,7 +9126,7 @@ function create_default_slot(ctx) {
 
   function loginformextra_checked_binding(value) {
     /*loginformextra_checked_binding*/
-    ctx[8](value);
+    ctx[7](value);
   }
 
   var loginformextra_props = {};
@@ -9204,7 +9202,7 @@ function create_default_slot(ctx) {
 
       if (dirty &
       /*$$scope*/
-      512) {
+      256) {
         formheader_changes.$$scope = {
           dirty: dirty,
           ctx: ctx
@@ -9216,7 +9214,7 @@ function create_default_slot(ctx) {
 
       if (dirty &
       /*$$scope, $form*/
-      513) {
+      257) {
         inputgroup0_changes.$$scope = {
           dirty: dirty,
           ctx: ctx
@@ -9228,7 +9226,7 @@ function create_default_slot(ctx) {
 
       if (dirty &
       /*$$scope, $form*/
-      513) {
+      257) {
         inputgroup1_changes.$$scope = {
           dirty: dirty,
           ctx: ctx
@@ -9356,7 +9354,7 @@ function create_fragment(ctx) {
 
       if (dirty &
       /*$$scope, $form*/
-      513) {
+      257) {
         form_1_changes.$$scope = {
           dirty: dirty,
           ctx: ctx
@@ -9396,16 +9394,6 @@ function instance($$self, $$props, $$invalidate) {
     $form.post('/login');
   };
 
-  var handleErrorMessage = function handleErrorMessage(errors) {
-    var errorCount = Object.keys(errors).length;
-
-    if (errorCount <= 1) {
-      return Object.values(errors)[0];
-    } else {
-      return "".concat(Object.values(errors)[0], " (and ").concat(errorCount, " more errors)");
-    }
-  };
-
   function forminput_value_binding(value) {
     if ($$self.$$.not_equal($form.email, value)) {
       $form.email = value;
@@ -9441,7 +9429,7 @@ function instance($$self, $$props, $$invalidate) {
     }
   }
 
-  return [$form, form, handleSubmit, handleErrorMessage, forminput_value_binding, forminput_value_binding_1, forminput_value_binding_2, forminput_value_binding_3, loginformextra_checked_binding];
+  return [$form, form, handleSubmit, forminput_value_binding, forminput_value_binding_1, forminput_value_binding_2, forminput_value_binding_3, loginformextra_checked_binding];
 }
 
 var LoginForm = /*#__PURE__*/function (_SvelteComponent) {
@@ -12636,6 +12624,45 @@ var config = {
     Accept: 'application/json'
   }
 };
+
+/***/ }),
+
+/***/ "./resources/js/util/handleFormErrorMessage.js":
+/*!*****************************************************!*\
+  !*** ./resources/js/util/handleFormErrorMessage.js ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "handleFormErrorMessage": () => (/* binding */ handleFormErrorMessage)
+/* harmony export */ });
+var handleFormErrorMessage = function handleFormErrorMessage(errors) {
+  var errorCount = Object.keys(errors).length;
+
+  if (errorCount <= 1) {
+    return Object.values(errors)[0];
+  } else {
+    return "".concat(Object.values(errors)[0], " (and ").concat(errorCount, " more errors)");
+  }
+};
+
+/***/ }),
+
+/***/ "./resources/js/util/index.js":
+/*!************************************!*\
+  !*** ./resources/js/util/index.js ***!
+  \************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "handleFormErrorMessage": () => (/* reexport safe */ _handleFormErrorMessage__WEBPACK_IMPORTED_MODULE_0__.handleFormErrorMessage)
+/* harmony export */ });
+/* harmony import */ var _handleFormErrorMessage__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./handleFormErrorMessage */ "./resources/js/util/handleFormErrorMessage.js");
+
 
 /***/ }),
 

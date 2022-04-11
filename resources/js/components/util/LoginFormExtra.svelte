@@ -1,11 +1,14 @@
 <script>
   import { inertia } from '@inertiajs/inertia-svelte';
+  // props
+  export let checked;
 </script>
 
 <div class="form-control my-5 flex-col justify-between gap-y-4 xs:flex-row">
   <!-- remember me -->
   <div class="flex items-center">
     <input
+      bind:checked
       id="remember-me"
       name="remember-me"
       type="checkbox"

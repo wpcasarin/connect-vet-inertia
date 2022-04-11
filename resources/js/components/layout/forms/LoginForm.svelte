@@ -1,7 +1,5 @@
 <script>
-  import axios from 'axios';
-  import { inertia } from '@inertiajs/inertia-svelte';
-  import { Inertia } from '@inertiajs/inertia';
+  import { inertia, useForm } from '@inertiajs/inertia-svelte';
   // local imports
   import SocialButtonGroup from '../../util/SocialButtonGroup.svelte';
   import LoginFormExtra from '../../util/LoginFormExtra.svelte';
@@ -13,33 +11,23 @@
   import FormLogo from '../../logos/FormLogo.svelte';
   import Form from '../../basics/Form.svelte';
   import Button from '../../buttons/Button.svelte';
-  import { config } from '../../../config/axios';
   // states
-  let formData = {
+  let form = useForm({
     email: '',
     password: '',
-  };
-  let inputErrors = {
-    email: false,
-    password: false,
-  };
-  let errorOpen = false;
-  let errorMessage = '';
+    remember: false,
+  });
   // methods
-  const handleErrors = (errorData) => {
-    errorOpen = errorData ? true : false;
-    inputErrors.email = 'email' in errorData ? true : false;
-    inputErrors.password = 'password' in errorData ? true : false;
+  const handleSubmit = () => {
+    $form.clearErrors();
+    $form.post('/login');
   };
-  // TODO: use Inertia only
-  const handleSubmit = async () => {
-    try {
-      const resp = await axios.post('/login', formData, config);
-      resp.status === 200 && Inertia.reload();
-      handleErrors(null);
-    } catch (error) {
-      errorMessage = error.response.data.message;
-      handleErrors(error.response.data.errors);
+  const handleErrorMessage = (errors) => {
+    const errorCount = Object.keys(errors).length;
+    if (errorCount <= 1) {
+      return Object.values(errors)[0];
+    } else {
+      return `${Object.values(errors)[0]} (and ${errorCount} more errors)`;
     }
   };
 </script>
@@ -62,29 +50,50 @@
   <FormDivider text="Or continue with" />
   <!-- email input -->
   <InputGroup>
-    <FormInput
-      type="text"
-      label="email address"
-      placeholder="john.doe@mail.com"
-      bind:value="{formData.email}"
-      bind:error="{inputErrors.email}" />
+    {#if $form.errors.email}
+      <FormInput
+        type="text"
+        label="email address"
+        placeholder="john.doe@mail.com"
+        error="{true}"
+        bind:value="{$form.email}" />
+    {:else}
+      <FormInput
+        type="text"
+        label="email address"
+        placeholder="john.doe@mail.com"
+        bind:value="{$form.email}" />
+    {/if}
   </InputGroup>
   <!-- password input -->
   <InputGroup>
-    <FormInput
-      type="password"
-      label="password"
-      placeholder="******"
-      bind:value="{formData.password}"
-      bind:error="{inputErrors.password}" />
+    {#if $form.errors.password}
+      <FormInput
+        type="password"
+        label="password"
+        placeholder="******"
+        error="{true}"
+        bind:value="{$form.password}" />
+    {:else}
+      <FormInput
+        type="password"
+        label="password"
+        placeholder="******"
+        bind:value="{$form.password}" />
+    {/if}
   </InputGroup>
 
   <!-- extra options -->
-  <LoginFormExtra />
-  <!-- error output -->
-  <FormAlert bind:open="{errorOpen}" bind:text="{errorMessage}" />
-  <!-- submit button -->
-  <Button text="Sign in" type="submit" />
+  <LoginFormExtra bind:checked="{$form.remember}" />
+
+  <div class="flex flex-col gap-y-4">
+    <!-- error output -->
+    {#if $form.hasErrors}
+      <FormAlert open="{true}" text="{handleErrorMessage($form.errors)}" />
+    {/if}
+    <!-- submit button -->
+    <Button text="Sign in" type="submit" />
+  </div>
 </Form>
 
 <style>

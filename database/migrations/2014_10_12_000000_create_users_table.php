@@ -13,13 +13,23 @@ return new class extends Migration
      */
     public function up()
     {
+        Schema::enableForeignKeyConstraints();
+
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('last_name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('type', ['ADMIN', 'TUTOR', 'VET']);
+            // tutor
+            $table->string('tutor_cpf')->unique()->nullable();
+            // vet
+            $table->string('vet_crmv')->unique()->nullable();
+            // extra info fields
             $table->rememberToken();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -20,11 +20,10 @@
     <div
       transition:slide={{ delay: 100, duration: 400, easing: quintOut }}
       class="space-y-1 px-2 pt-2 pb-3">
-      <MobileMenuLink to="/" text="home" />
-      <MobileMenuLink to="/about" text="about" />
-
-      {#if !user}
-        <div class="divider before:bg-gray-600 after:bg-gray-600" />
+      {#if user}
+        <MobileMenuLink to="/" text="home" />
+        <MobileMenuLink to="/about" text="about" />
+      {:else}
         <MobileMenuLink to="/login" text="login" />
         <MobileMenuLink to="/register" text="register" />
       {/if}

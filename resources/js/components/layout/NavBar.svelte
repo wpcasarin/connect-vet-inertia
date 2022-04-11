@@ -22,10 +22,12 @@
         <NavBarLogo />
         <div class="hidden sm:ml-6 sm:block">
           <!-- nav links left -->
-          <ul class="flex space-x-4">
-            <NavBarLink to="/" text="home" />
-            <NavBarLink to="/about" text="about" />
-          </ul>
+          {#if user}
+            <ul class="flex space-x-4">
+              <NavBarLink to="/" text="home" />
+              <NavBarLink to="/about" text="about" />
+            </ul>
+          {/if}
         </div>
       </div>
       <div

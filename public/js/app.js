@@ -9362,7 +9362,7 @@ function create_default_slot_5(ctx) {
       dispose();
     }
   };
-} // (88:2) <InputGroup>
+} // (93:2) <InputGroup>
 
 
 function create_default_slot_4(ctx) {
@@ -9543,7 +9543,7 @@ function create_default_slot_4(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminput1, detaching);
     }
   };
-} // (121:4) {:else}
+} // (126:4) {:else}
 
 
 function create_else_block(ctx) {
@@ -9643,7 +9643,7 @@ function create_else_block(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminput, detaching);
     }
   };
-} // (114:4) {#if formData.type === 'TUTOR'}
+} // (119:4) {#if formData.type === 'TUTOR'}
 
 
 function create_if_block(ctx) {
@@ -9743,7 +9743,7 @@ function create_if_block(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminput, detaching);
     }
   };
-} // (105:2) <InputGroup>
+} // (110:2) <InputGroup>
 
 
 function create_default_slot_3(ctx) {
@@ -9893,7 +9893,7 @@ function create_default_slot_3(ctx) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(if_block_anchor);
     }
   };
-} // (131:2) <InputGroup>
+} // (136:2) <InputGroup>
 
 
 function create_default_slot_2(ctx) {
@@ -9966,18 +9966,18 @@ function create_default_slot_2(ctx) {
 
   if (
   /*formData*/
-  ctx[0].confirm_password !== void 0) {
+  ctx[0].password_confirmation !== void 0) {
     forminput1_props.value =
     /*formData*/
-    ctx[0].confirm_password;
+    ctx[0].password_confirmation;
   }
 
   if (
   /*inputErrors*/
-  ctx[1].confirm_password !== void 0) {
+  ctx[1].password_confirmation !== void 0) {
     forminput1_props.error =
     /*inputErrors*/
-    ctx[1].confirm_password;
+    ctx[1].password_confirmation;
   }
 
   forminput1 = new _inputs_FormInput_svelte__WEBPACK_IMPORTED_MODULE_11__["default"]({
@@ -10037,7 +10037,7 @@ function create_default_slot_2(ctx) {
         updating_value_1 = true;
         forminput1_changes.value =
         /*formData*/
-        ctx[0].confirm_password;
+        ctx[0].password_confirmation;
         (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
           return updating_value_1 = false;
         });
@@ -10049,7 +10049,7 @@ function create_default_slot_2(ctx) {
         updating_error_1 = true;
         forminput1_changes.error =
         /*inputErrors*/
-        ctx[1].confirm_password;
+        ctx[1].password_confirmation;
         (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_flush_callback)(function () {
           return updating_error_1 = false;
         });
@@ -10074,7 +10074,7 @@ function create_default_slot_2(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminput1, detaching);
     }
   };
-} // (149:4) <InputGroup>
+} // (154:4) <InputGroup>
 
 
 function create_default_slot_1(ctx) {
@@ -10146,7 +10146,7 @@ function create_default_slot_1(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminputselect, detaching);
     }
   };
-} // (70:0) <Form handleSubmit="{handleSubmit}">
+} // (75:0) <Form handleSubmit="{handleSubmit}">
 
 
 function create_default_slot(ctx) {
@@ -10527,7 +10527,7 @@ function instance($$self, $$props, $$invalidate) {
     last_name: '',
     email: '',
     password: '',
-    confirm_password: '',
+    password_confirmation: '',
     tutor_cpf: '',
     vet_crmv: ''
   };
@@ -10536,7 +10536,7 @@ function instance($$self, $$props, $$invalidate) {
     last_name: false,
     email: false,
     password: false,
-    confirm_password: false,
+    password_confirmation: false,
     tutor_cpf: false,
     vet_crmv: false,
     type: 'TUTOR'
@@ -10554,8 +10554,12 @@ function instance($$self, $$props, $$invalidate) {
 
   var handleErrors = function handleErrors(errorData) {
     $$invalidate(2, errorOpen = errorData ? true : false);
-    emailError = 'email' in errorData ? true : false;
-    passwordError = 'password' in errorData ? true : false;
+    $$invalidate(1, inputErrors.name = 'name' in errorData ? true : false, inputErrors);
+    $$invalidate(1, inputErrors.last_name = 'last_name' in errorData ? true : false, inputErrors);
+    $$invalidate(1, inputErrors.email = 'email' in errorData ? true : false, inputErrors);
+    $$invalidate(1, inputErrors.password = 'password' in errorData ? true : false, inputErrors);
+    $$invalidate(1, inputErrors.tutor_cpf = 'tutor_cpf' in errorData ? true : false, inputErrors);
+    $$invalidate(1, inputErrors.vet_crmv = 'vet_crmv' in errorData ? true : false, inputErrors);
   }; // TODO: use Inertia only
 
 
@@ -10682,15 +10686,15 @@ function instance($$self, $$props, $$invalidate) {
   }
 
   function forminput1_value_binding_1(value) {
-    if ($$self.$$.not_equal(formData.confirm_password, value)) {
-      formData.confirm_password = value;
+    if ($$self.$$.not_equal(formData.password_confirmation, value)) {
+      formData.password_confirmation = value;
       $$invalidate(0, formData);
     }
   }
 
   function forminput1_error_binding_1(value) {
-    if ($$self.$$.not_equal(inputErrors.confirm_password, value)) {
-      inputErrors.confirm_password = value;
+    if ($$self.$$.not_equal(inputErrors.password_confirmation, value)) {
+      inputErrors.password_confirmation = value;
       $$invalidate(1, inputErrors);
     }
   }

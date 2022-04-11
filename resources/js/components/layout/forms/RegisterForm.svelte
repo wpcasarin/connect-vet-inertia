@@ -20,7 +20,7 @@
     last_name: '',
     email: '',
     password: '',
-    confirm_password: '',
+    password_confirmation: '',
     tutor_cpf: '',
     vet_crmv: '',
   };
@@ -29,7 +29,7 @@
     last_name: false,
     email: false,
     password: false,
-    confirm_password: false,
+    password_confirmation: false,
     tutor_cpf: false,
     vet_crmv: false,
     type: 'TUTOR',
@@ -50,11 +50,16 @@
   // methods
   const handleErrors = (errorData) => {
     errorOpen = errorData ? true : false;
-    emailError = 'email' in errorData ? true : false;
-    passwordError = 'password' in errorData ? true : false;
+    inputErrors.name = 'name' in errorData ? true : false;
+    inputErrors.last_name = 'last_name' in errorData ? true : false;
+    inputErrors.email = 'email' in errorData ? true : false;
+    inputErrors.password = 'password' in errorData ? true : false;
+    inputErrors.tutor_cpf = 'tutor_cpf' in errorData ? true : false;
+    inputErrors.vet_crmv = 'vet_crmv' in errorData ? true : false;
   };
   // TODO: use Inertia only
   const handleSubmit = async () => {
+    // console.log(formData);
     try {
       const resp = await axios.post('/register', formData, config);
       resp.status === 200 && Inertia.reload();
@@ -141,8 +146,8 @@
       type="password"
       label="confirm password"
       placeholder="******"
-      bind:value="{formData.confirm_password}"
-      bind:error="{inputErrors.confirm_password}" />
+      bind:value="{formData.password_confirmation}"
+      bind:error="{inputErrors.password_confirmation}" />
   </InputGroup>
   <!-- input group 4 -->
   <div class="flex flex-col gap-y-4">

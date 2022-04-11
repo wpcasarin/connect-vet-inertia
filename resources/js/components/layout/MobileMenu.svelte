@@ -4,8 +4,13 @@
   import { quintOut } from 'svelte/easing';
   // local imports
   import MobileMenuLink from '../buttons/MobileMenuLink.svelte';
-  // props
-  export let open = true;
+  import { mobileMenuOpen } from '../../stores';
+  // states
+  let open;
+  // stores
+  mobileMenuOpen.subscribe((value) => {
+    open = value;
+  });
   // states
   $: user = $page['props']['user'];
 </script>

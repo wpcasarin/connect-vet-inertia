@@ -1,5 +1,4 @@
 <script>
-  import { setContext } from 'svelte';
   //local imports
   import NavBarLink from '../buttons/NavBarLink.svelte';
   import NavBarLogo from '../logos/NavBarLogo.svelte';
@@ -9,14 +8,6 @@
   import { page } from '@inertiajs/inertia-svelte';
   // states
   $: user = $page['props']['user'];
-  let mobileMenuOpen = false;
-  // methods
-  const handleMobileMenuOpen = () => {
-    mobileMenuOpen = !mobileMenuOpen;
-  };
-  //context
-  setContext('handleMobileMenuOpen', handleMobileMenuOpen);
-  setContext('mobileMenuOpen', mobileMenuOpen);
 </script>
 
 <header class="bg-neutral">
@@ -55,7 +46,7 @@
     </div>
 
     <!-- Mobile menu, show/hide based on menu state. -->
-    <MobileMenu bind:open={mobileMenuOpen} />
+    <MobileMenu />
   </nav>
 </header>
 

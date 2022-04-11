@@ -1,11 +1,15 @@
 <script>
-  import { getContext } from 'svelte';
-  //context
-  const handleMobileMenuOpen = getContext('handleMobileMenuOpen');
-  let open = getContext('mobileMenuOpen');
+  // local imports
+  import { mobileMenuOpen } from '../../stores';
+  // states
+  let open;
+  // stores
+  mobileMenuOpen.subscribe((value) => {
+    open = value;
+  });
+  // methods
   const handleClick = () => {
-    open = !open;
-    handleMobileMenuOpen();
+    mobileMenuOpen.set(!open);
   };
 </script>
 

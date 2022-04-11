@@ -5,7 +5,7 @@
   export let disabled = false;
 </script>
 
-<button class="btn btn-primary capitalize" type="{type}" disabled="{disabled}">
+<button class="btn btn-primary capitalize" type={type} disabled={disabled}>
   {text}
 </button>
 

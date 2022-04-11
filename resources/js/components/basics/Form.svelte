@@ -3,7 +3,7 @@
   export let handleSubmit;
 </script>
 
-<form class="flex h-fit flex-col" on:submit|preventDefault="{handleSubmit}">
+<form class="flex h-fit flex-col" on:submit|preventDefault={handleSubmit}>
   <slot />
 </form>
 

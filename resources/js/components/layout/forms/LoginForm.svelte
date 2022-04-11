@@ -25,7 +25,7 @@
   };
 </script>
 
-<Form handleSubmit="{handleSubmit}">
+<Form handleSubmit={handleSubmit}>
   <!-- logo -->
   <FormLogo />
   <!-- header -->
@@ -48,14 +48,14 @@
         type="text"
         label="email address"
         placeholder="john.doe@mail.com"
-        error="{true}"
-        bind:value="{$form.email}" />
+        error={true}
+        bind:value={$form.email} />
     {:else}
       <FormInput
         type="text"
         label="email address"
         placeholder="john.doe@mail.com"
-        bind:value="{$form.email}" />
+        bind:value={$form.email} />
     {/if}
   </InputGroup>
   <!-- password input -->
@@ -65,27 +65,27 @@
         type="password"
         label="password"
         placeholder="******"
-        error="{true}"
-        bind:value="{$form.password}" />
+        error={true}
+        bind:value={$form.password} />
     {:else}
       <FormInput
         type="password"
         label="password"
         placeholder="******"
-        bind:value="{$form.password}" />
+        bind:value={$form.password} />
     {/if}
   </InputGroup>
 
   <!-- extra options -->
-  <LoginFormExtra bind:checked="{$form.remember}" />
+  <LoginFormExtra bind:checked={$form.remember} />
 
   <div class="flex flex-col gap-y-4">
     <!-- error output -->
     {#if $form.hasErrors}
-      <FormAlert open="{true}" text="{handleFormErrorMessage($form.errors)}" />
+      <FormAlert open={true} text={handleFormErrorMessage($form.errors)} />
     {/if}
     <!-- submit button -->
-    <Button text="Sign in" type="submit" disabled="{$form.processing}" />
+    <Button text="Sign in" type="submit" disabled={$form.processing} />
   </div>
 </Form>
 

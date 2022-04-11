@@ -15,16 +15,16 @@
 </script>
 
 <div class="form-control flex-grow">
-  <label for="{id}" class="label px-0">
+  <label for={id} class="label px-0">
     <span class="label-text font-medium first-letter:capitalize">{label}</span>
   </label>
   <input
-    id="{id}"
-    type="{type}"
-    value="{value}"
-    placeholder="{placeholder}"
-    class="{`input input-bordered ${error && 'input-error'}`}"
-    on:input="{handleInput}" />
+    id={id}
+    type={type}
+    value={value}
+    placeholder={placeholder}
+    class={`input input-bordered ${error && 'input-error'}`}
+    on:input={handleInput} />
 </div>
 
 <style>

@@ -6,7 +6,7 @@
 </script>
 
 <li>
-  <a href="{to}" use:inertia>
+  <a href={to} use:inertia>
     {text}
   </a>
 </li>

@@ -9073,7 +9073,7 @@ function create_if_block(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(formalert, detaching);
     }
   };
-} // (28:0) <Form handleSubmit="{handleSubmit}">
+} // (28:0) <Form handleSubmit={handleSubmit}>
 
 
 function create_default_slot(ctx) {
@@ -10385,7 +10385,7 @@ function create_default_slot_1(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(forminputselect, detaching);
     }
   };
-} // (75:0) <Form handleSubmit="{handleSubmit}">
+} // (75:0) <Form handleSubmit={handleSubmit}>
 
 
 function create_default_slot(ctx) {

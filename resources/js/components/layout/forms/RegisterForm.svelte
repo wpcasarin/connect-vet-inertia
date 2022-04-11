@@ -72,7 +72,7 @@
   };
 </script>
 
-<Form handleSubmit="{handleSubmit}">
+<Form handleSubmit={handleSubmit}>
   <!-- logo -->
   <FormLogo />
   <!-- header -->
@@ -96,15 +96,15 @@
       type="text"
       label="name"
       placeholder="John"
-      bind:value="{formData.name}"
-      bind:error="{inputErrors.name}" />
+      bind:value={formData.name}
+      bind:error={inputErrors.name} />
     <!-- last name input -->
     <FormInput
       type="text"
       label="last name"
       placeholder="Doe"
-      bind:value="{formData.last_name}"
-      bind:error="{inputErrors.last_name}" />
+      bind:value={formData.last_name}
+      bind:error={inputErrors.last_name} />
   </InputGroup>
   <!-- input group 2 -->
   <InputGroup>
@@ -113,23 +113,23 @@
       type="text"
       label="email address"
       placeholder="john.doe@mail.com"
-      bind:value="{formData.email}"
-      bind:error="{inputErrors.email}" />
+      bind:value={formData.email}
+      bind:error={inputErrors.email} />
     <!-- unique field -->
     {#if formData.type === 'TUTOR'}
       <FormInput
         type="text"
         label="CPF"
         placeholder="000.000.000-00"
-        bind:value="{formData.tutor_cpf}"
-        bind:error="{inputErrors.tutor_cpf}" />
+        bind:value={formData.tutor_cpf}
+        bind:error={inputErrors.tutor_cpf} />
     {:else}
       <FormInput
         type="text"
         label="CRMV"
         placeholder="0000-00"
-        bind:value="{formData.vet_crmv}"
-        bind:error="{inputErrors.vet_crmv}" />
+        bind:value={formData.vet_crmv}
+        bind:error={inputErrors.vet_crmv} />
     {/if}
   </InputGroup>
   <!-- input group 3 -->
@@ -139,26 +139,26 @@
       type="password"
       label="password"
       placeholder="******"
-      bind:value="{formData.password}"
-      bind:error="{inputErrors.password}" />
+      bind:value={formData.password}
+      bind:error={inputErrors.password} />
     <!-- confirm password input -->
     <FormInput
       type="password"
       label="confirm password"
       placeholder="******"
-      bind:value="{formData.password_confirmation}"
-      bind:error="{inputErrors.password_confirmation}" />
+      bind:value={formData.password_confirmation}
+      bind:error={inputErrors.password_confirmation} />
   </InputGroup>
   <!-- input group 4 -->
   <div class="flex flex-col gap-y-4">
     <InputGroup>
       <FormInputSelect
         label="who Am I?"
-        options="{inputOptions}"
-        bind:value="{formData.type}" />
+        options={inputOptions}
+        bind:value={formData.type} />
     </InputGroup>
     <!-- error output -->
-    <FormAlert bind:open="{errorOpen}" bind:text="{errorMessage}" />
+    <FormAlert bind:open={errorOpen} bind:text={errorMessage} />
     <!-- submit button -->
     <Button text="Sign up" type="submit" />
   </div>

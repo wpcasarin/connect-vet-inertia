@@ -3,7 +3,7 @@
 </script>
 
 <main class="container-fluid mx-auto">
-  <div class="bg-image hidden lg:block"></div>
+  <div class="bg-image hidden lg:block" />
   <slot />
 </main>
 

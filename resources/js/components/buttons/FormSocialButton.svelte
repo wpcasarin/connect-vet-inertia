@@ -5,7 +5,7 @@
 </script>
 
 <a
-  href="{to}"
+  href={to}
   class="btn btn-outline btn-sm h-10 flex-grow border-base-content border-opacity-20 py-2 text-neutral-focus text-opacity-80"
   use:inertia>
   <slot />

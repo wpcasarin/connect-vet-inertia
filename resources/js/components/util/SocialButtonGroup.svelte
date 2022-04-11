@@ -9,7 +9,7 @@
 </script>
 
 <div class="form-control mb-2">
-  <p class="{`mb-2 text-sm font-medium text-base-content ${text || 'hidden'}`}">
+  <p class={`mb-2 text-sm font-medium text-base-content ${text || 'hidden'}`}>
     {text}
   </p>
   <div class="flex justify-between gap-3">

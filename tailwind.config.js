@@ -23,6 +23,15 @@ module.exports = {
   },
   plugins: [require('daisyui')],
   daisyui: {
-    themes: ['light'],
+    themes: [
+      {
+        light: {
+          ...require('daisyui/src/colors/themes')['[data-theme=light]'],
+          primary: '#6366F1',
+          'primary-focus': '#4F46E5',
+          neutral: '#1F2937',
+        },
+      },
+    ],
   },
 };

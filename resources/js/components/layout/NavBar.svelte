@@ -1,24 +1,66 @@
 <script>
-  import NavBarDrawerButton from '../buttons/NavBarDrawerButton.svelte';
-  import NavBarLinkButton from '../buttons/NavBarLinkButton.svelte';
+  import { setContext } from 'svelte';
+  //local imports
+  import NavBarLink from '../buttons/NavBarLink.svelte';
+  import NavBarLogo from '../logos/NavBarLogo.svelte';
+  import MobileMenu from './MobileMenu.svelte';
+  import ProfileDropdown from './ProfileDropdown.svelte';
+  import MobileMenuButton from '../buttons/MobileMenuButton.svelte';
+  import { page } from '@inertiajs/inertia-svelte';
+  // states
+  $: user = $page['props']['user'];
+  let mobileMenuOpen = false;
+  // methods
+  const handleMobileMenuOpen = () => {
+    mobileMenuOpen = !mobileMenuOpen;
+  };
+  //context
+  setContext('handleMobileMenuOpen', handleMobileMenuOpen);
+  setContext('mobileMenuOpen', mobileMenuOpen);
 </script>
 
-<header class="w-full bg-base-300">
-  <nav class="container navbar mx-auto p-0">
-    <NavBarDrawerButton />
-    <!-- brand -->
-    <div class="mx-2 flex-1 px-2">Navbar Title</div>
-    <!-- navigation bar -->
-    <div class="hidden flex-none lg:block">
-      <ul class="menu menu-horizontal">
-        <!-- Navbar menu content here -->
-        <NavBarLinkButton to="/login" text="login" />
-        <NavBarLinkButton to="/register" text="register" />
-      </ul>
+<header class="bg-neutral">
+  <nav class="container-fluid mx-auto px-2 sm:container sm:px-4">
+    <div class="relative flex h-16 items-center justify-between">
+      <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+        <!-- Mobile menu button-->
+        <MobileMenuButton />
+      </div>
+      <div
+        class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+        <NavBarLogo />
+        <div class="hidden sm:ml-6 sm:block">
+          <!-- nav links left -->
+          <ul class="flex space-x-4">
+            <NavBarLink to="/" text="home" />
+            <NavBarLink to="/about" text="about" />
+          </ul>
+        </div>
+      </div>
+      <div
+        class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+        <!-- nav links right -->
+        {#if !user}
+          <ul class="hidden space-x-4 sm:flex">
+            <NavBarLink to="/login" text="login" />
+            <NavBarLink to="/register" text="register" />
+          </ul>
+        {/if}
+
+        <!-- Profile dropdown -->
+        {#if user}
+          <ProfileDropdown />
+        {/if}
+      </div>
     </div>
+
+    <!-- Mobile menu, show/hide based on menu state. -->
+    <MobileMenu bind:open={mobileMenuOpen} />
   </nav>
 </header>
 
 <style>
-  /* your styles go here */
+  header {
+    min-width: 240px;
+  }
 </style>

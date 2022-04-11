@@ -97,14 +97,14 @@
     <!-- email input -->
     {#if $form.errors.email}
       <FormInput
-        type="text"
+        type="email"
         label="email address"
         placeholder="john.doe@mail.com"
         error={true}
         bind:value={$form.email} />
     {:else}
       <FormInput
-        type="text"
+        type="email"
         label="email address"
         placeholder="john.doe@mail.com"
         bind:value={$form.email} />

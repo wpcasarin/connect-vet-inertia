@@ -1,2 +1,2 @@
-js/app.css
-css/app.js
+./js/*.*
+./css/*.*

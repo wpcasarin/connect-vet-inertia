@@ -13,7 +13,10 @@
   <label for={id} class="label px-0">
     <span class="label-text font-medium first-letter:capitalize">{label}</span>
   </label>
-  <select bind:value id={id} class="select select-bordered">
+  <select
+    bind:value
+    id={id}
+    class={`select select-bordered ${error && 'select-error'}`}>
     {#each options as option}
       <!-- content here -->
       <option value={option.value}>{option.text}</option>

@@ -5745,7 +5745,7 @@ function get_each_context(ctx, list, i) {
   var child_ctx = ctx.slice();
   child_ctx[6] = list[i];
   return child_ctx;
-} // (17:4) {#each options as option}
+} // (20:4) {#each options as option}
 
 
 function create_each_block(ctx) {
@@ -5771,13 +5771,13 @@ function create_each_block(ctx) {
     p: function p(ctx, dirty) {
       if (dirty &
       /*options*/
-      4 && t_value !== (t_value =
+      8 && t_value !== (t_value =
       /*option*/
       ctx[6].text + "")) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.set_data)(t, t_value);
 
       if (dirty &
       /*options*/
-      4 && option_value_value !== (option_value_value =
+      8 && option_value_value !== (option_value_value =
       /*option*/
       ctx[6].value)) {
         option.__value = option_value_value;
@@ -5797,11 +5797,12 @@ function create_fragment(ctx) {
   var t0;
   var t1;
   var select;
+  var select_class_value;
   var mounted;
   var dispose;
   var each_value =
   /*options*/
-  ctx[2];
+  ctx[3];
   var each_blocks = [];
 
   for (var i = 0; i < each_value.length; i += 1) {
@@ -5826,12 +5827,14 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span, "class", "label-text font-medium first-letter:capitalize");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(label_1, "for",
       /*id*/
-      ctx[3]);
+      ctx[4]);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(label_1, "class", "label px-0");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(select, "id",
       /*id*/
-      ctx[3]);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(select, "class", "select select-bordered");
+      ctx[4]);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(select, "class", select_class_value = "select select-bordered ".concat(
+      /*error*/
+      ctx[2] && 'select-error'));
       if (
       /*value*/
       ctx[0] === void 0) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_render_callback)(function () {
@@ -5877,10 +5880,10 @@ function create_fragment(ctx) {
 
       if (dirty &
       /*options*/
-      4) {
+      8) {
         each_value =
         /*options*/
-        ctx[2];
+        ctx[3];
 
         var _i3;
 
@@ -5906,8 +5909,16 @@ function create_fragment(ctx) {
       }
 
       if (dirty &
+      /*error*/
+      4 && select_class_value !== (select_class_value = "select select-bordered ".concat(
+      /*error*/
+      ctx[2] && 'select-error'))) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(select, "class", select_class_value);
+      }
+
+      if (dirty &
       /*value, options*/
-      5) {
+      9) {
         (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.select_option)(select,
         /*value*/
         ctx[0]);
@@ -5936,17 +5947,17 @@ function instance($$self, $$props, $$invalidate) {
   function select_change_handler() {
     value = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.select_value)(this);
     $$invalidate(0, value);
-    $$invalidate(2, options);
+    $$invalidate(3, options);
   }
 
   $$self.$$set = function ($$props) {
     if ('label' in $$props) $$invalidate(1, label = $$props.label);
     if ('value' in $$props) $$invalidate(0, value = $$props.value);
-    if ('error' in $$props) $$invalidate(4, error = $$props.error);
-    if ('options' in $$props) $$invalidate(2, options = $$props.options);
+    if ('error' in $$props) $$invalidate(2, error = $$props.error);
+    if ('options' in $$props) $$invalidate(3, options = $$props.options);
   };
 
-  return [value, label, options, id, error, select_change_handler];
+  return [value, label, error, options, id, select_change_handler];
 }
 
 var FormInputSelect = /*#__PURE__*/function (_SvelteComponent) {
@@ -5963,8 +5974,8 @@ var FormInputSelect = /*#__PURE__*/function (_SvelteComponent) {
     (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.init)(_assertThisInitialized(_this), options, instance, create_fragment, svelte_internal__WEBPACK_IMPORTED_MODULE_0__.safe_not_equal, {
       label: 1,
       value: 0,
-      error: 4,
-      options: 2
+      error: 2,
+      options: 3
     });
     return _this;
   }

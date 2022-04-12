@@ -1537,6 +1537,11 @@ body[dir="rtl"] .checkbox:checked,
   border-bottom-right-radius: inherit;
   border-bottom-left-radius: inherit;
 }
+.mockup-phone .display {
+  overflow: hidden;
+  border-radius: 40px;
+  margin-top: -25px;
+}
 @-webkit-keyframes progress-loading {
 
   50% {

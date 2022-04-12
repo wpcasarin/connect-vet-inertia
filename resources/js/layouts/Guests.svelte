@@ -1,5 +1,6 @@
 <script>
   import NavBar from '../components/layout/NavBar.svelte';
+  import Footer from '../components/layout/Footer.svelte';
 </script>
 
 <div class="flex h-screen flex-grow flex-col">
@@ -7,6 +8,8 @@
   <NavBar />
   <!-- Page content here -->
   <slot />
+  <!-- Footer -->
+  <Footer />
 </div>
 
 <style>

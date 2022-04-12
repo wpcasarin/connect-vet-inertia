@@ -21,5 +21,8 @@ Route::get('/', function () {
 Route::get('/about', function () {
     return Inertia::render('About', ["user" => Auth::user()]);
 });
+Route::get('/pets', function () {
+    return Inertia::render('Pets', ["user" => Auth::user()]);
+});
 
 require __DIR__ . '/auth.php';

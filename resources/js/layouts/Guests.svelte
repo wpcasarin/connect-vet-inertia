@@ -3,7 +3,7 @@
   import Footer from '../components/layout/Footer.svelte';
 </script>
 
-<div class="flex h-screen flex-grow flex-col">
+<div class="flex min-h-screen flex-grow flex-col">
   <!-- Navbar -->
   <NavBar />
   <!-- Page content here -->

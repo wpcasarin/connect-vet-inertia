@@ -8,7 +8,8 @@
 </svelte:head>
 
 <Guests>
-  <div class="container-fluid mx-5 mt-10 min-h-screen sm:container sm:mx-auto">
+  <div
+    class="container-fluid mx-5 mt-10 min-h-screen px-4 sm:container sm:mx-auto sm:px-2">
     <main class="flex flex-col gap-8 lg:grid lg:grid-cols-2 xl:grid-cols-3">
       <PetCard />
       <PetCard />

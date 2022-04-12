@@ -18,5 +18,8 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('Home', ["user" => Auth::user()]);
 });
+Route::get('/about', function () {
+    return Inertia::render('About', ["user" => Auth::user()]);
+});
 
 require __DIR__ . '/auth.php';

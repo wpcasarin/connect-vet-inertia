@@ -36,7 +36,7 @@
     </div>
   </main>
   <img
-    src="assets/hero_img.svg"
+    src="assets/hero_illustration.svg"
     alt="Man looking to a cat"
     class="mx-auto max-w-xs sm:max-w-sm md:max-w-lg xl:max-w-3xl" />
 </section>

@@ -7360,7 +7360,7 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div2, "class", "mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div3, "class", "sm:text-center lg:text-left");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(main, "class", "my-auto mx-auto h-fit max-w-2xl px-2 pb-0 sm:px-4 lg:pb-40");
-      if (!(0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.src_url_equal)(img.src, img_src_value = "assets/hero_img.svg")) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "src", img_src_value);
+      if (!(0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.src_url_equal)(img.src, img_src_value = "assets/hero_illustration.svg")) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "src", img_src_value);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "alt", "Man looking to a cat");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "class", "mx-auto max-w-xs sm:max-w-sm md:max-w-lg xl:max-w-3xl");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(section, "class", "container mx-auto flex flex-grow flex-col justify-center align-middle lg:flex-row");

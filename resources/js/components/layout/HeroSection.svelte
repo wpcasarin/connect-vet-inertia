@@ -3,8 +3,8 @@
 </script>
 
 <section
-  class="container mx-auto flex flex-grow flex-col justify-center align-middle lg:flex-row">
-  <main class="my-auto mx-auto h-fit max-w-2xl px-2 pb-0 sm:px-4 lg:pb-40">
+  class="container mx-auto flex flex-grow flex-col items-center justify-center lg:flex-row">
+  <main class="my-auto h-fit max-w-2xl px-2 pb-0 sm:px-4 lg:pb-40">
     <div class="sm:text-center lg:text-left">
       <h1
         class="text-4xl font-extrabold tracking-tight text-neutral sm:text-5xl md:text-6xl">

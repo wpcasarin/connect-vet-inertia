@@ -7768,6 +7768,10 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 
 
+function add_css(target) {
+  (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append_styles)(target, "svelte-m3t0d7", "footer.svelte-m3t0d7{min-height:100px}");
+}
+
 function create_fragment(ctx) {
   var div2;
   var footer;
@@ -7831,7 +7835,7 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a2, "href", "https://www.instagram.com/");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a2, "target", "_blank");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div1, "class", "grid-flow-col gap-4 md:place-self-center md:justify-self-end");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(footer, "class", "container-fluid footer mx-auto items-center p-4 sm:container");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(footer, "class", "container-fluid footer mx-auto items-center p-4 sm:container svelte-m3t0d7");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div2, "class", "mt-10 bg-neutral text-neutral-content");
     },
     m: function m(target, anchor) {
@@ -7893,7 +7897,7 @@ var Footer = /*#__PURE__*/function (_SvelteComponent) {
     _classCallCheck(this, Footer);
 
     _this = _super.call(this);
-    (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.init)(_assertThisInitialized(_this), options, instance, create_fragment, svelte_internal__WEBPACK_IMPORTED_MODULE_0__.safe_not_equal, {});
+    (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.init)(_assertThisInitialized(_this), options, instance, create_fragment, svelte_internal__WEBPACK_IMPORTED_MODULE_0__.safe_not_equal, {}, add_css);
     return _this;
   }
 

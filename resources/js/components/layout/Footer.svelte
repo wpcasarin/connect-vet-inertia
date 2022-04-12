@@ -43,4 +43,7 @@
 
 <style>
   /* your styles go here */
+  footer {
+    min-height: 100px;
+  }
 </style>

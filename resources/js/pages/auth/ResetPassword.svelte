@@ -1,16 +1,16 @@
 <script>
   import Auth from '../../layouts/Auth.svelte';
-  import LoginForm from '../../components/layout/forms/LoginForm.svelte';
+  import ResetPasswordForm from '../../components/layout/forms/ResetPasswordForm.svelte';
   import AuthFormContainer from '../../components/containers/AuthFormContainer.svelte';
 </script>
 
 <svelte:head>
-  <title>ConnectVet ─ Login</title>
+  <title>ConnectVet ─ Reset Password</title>
 </svelte:head>
 
 <Auth>
   <AuthFormContainer>
-    <LoginForm />
+    <ResetPasswordForm />
   </AuthFormContainer>
 </Auth>
 

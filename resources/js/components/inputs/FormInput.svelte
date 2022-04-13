@@ -5,6 +5,7 @@
   export let label;
   export let value;
   export let error;
+  export let readonly;
   export let placeholder;
   // generate id for label
   const id = uuid();
@@ -19,6 +20,7 @@
     <span class="label-text font-medium first-letter:capitalize">{label}</span>
   </label>
   <input
+    readonly={readonly}
     id={id}
     type={type}
     value={value}

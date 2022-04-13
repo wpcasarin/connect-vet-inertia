@@ -20,7 +20,7 @@
   <!-- forgot password -->
   <div class="text-sm">
     <a
-      href="/login"
+      href="/forgot-password"
       class="font-medium text-primary hover:text-primary-focus"
       use:inertia>
       Forgot your password?

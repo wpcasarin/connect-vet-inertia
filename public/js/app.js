@@ -8166,8 +8166,8 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(main, "class", "my-auto h-fit max-w-2xl px-2 pb-0 sm:px-4 lg:pb-40");
       if (!(0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.src_url_equal)(img.src, img_src_value = "assets/hero_illustration.svg")) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "src", img_src_value);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "alt", "Man looking to a cat");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "class", "mx-auto max-w-xs sm:max-w-sm md:max-w-lg xl:max-w-3xl");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(section, "class", "container mx-auto flex flex-grow flex-col items-center justify-center lg:flex-row");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "class", "mx-auto mt-5 max-w-xs sm:max-w-sm md:max-w-lg xl:max-w-3xl");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(section, "class", "container mx-auto mt-5 flex flex-grow flex-col items-center justify-center sm:mt-10 lg:flex-row");
     },
     m: function m(target, anchor) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, section, anchor);

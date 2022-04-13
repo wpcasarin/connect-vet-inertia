@@ -3,7 +3,7 @@
 </script>
 
 <section
-  class="container mx-auto flex flex-grow flex-col items-center justify-center lg:flex-row">
+  class="container mx-auto mt-5 flex flex-grow flex-col items-center justify-center sm:mt-10 lg:flex-row">
   <main class="my-auto h-fit max-w-2xl px-2 pb-0 sm:px-4 lg:pb-40">
     <div class="sm:text-center lg:text-left">
       <h1
@@ -38,7 +38,7 @@
   <img
     src="assets/hero_illustration.svg"
     alt="Man looking to a cat"
-    class="mx-auto max-w-xs sm:max-w-sm md:max-w-lg xl:max-w-3xl" />
+    class="mx-auto mt-5 max-w-xs sm:max-w-sm md:max-w-lg xl:max-w-3xl" />
 </section>
 
 <style>

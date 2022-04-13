@@ -2752,6 +2752,10 @@ body[dir="rtl"] .checkbox:checked,
     margin-left: 1.5rem;
   }
 
+  .sm\:mt-10 {
+    margin-top: 2.5rem;
+  }
+
   .sm\:block {
     display: block;
   }

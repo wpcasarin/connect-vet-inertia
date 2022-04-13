@@ -1,5 +1,5 @@
 <script>
-  import { inertia, useForm, page } from '@inertiajs/inertia-svelte';
+  import { useForm, page } from '@inertiajs/inertia-svelte';
   // local imports
   import FormHeader from '../../headers/FormHeader.svelte';
   import FormAlert from '../../display/FormAlert.svelte';
@@ -52,7 +52,7 @@
 
   <div class="mt-4 flex flex-col gap-y-4">
     <!-- submit button -->
-    <Button text="Send email" type="submit" disabled={$form.processing} />
+    <Button text="Reset password" type="submit" disabled={$form.processing} />
     <!-- error output -->
     {#if $form.hasErrors}
       <FormAlert open={true} text={handleFormErrorMessage($form.errors)} />

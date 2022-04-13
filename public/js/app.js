@@ -11892,7 +11892,7 @@ function create_default_slot(ctx) {
   });
   button = new _buttons_Button_svelte__WEBPACK_IMPORTED_MODULE_7__["default"]({
     props: {
-      text: "Send email",
+      text: "Reset password",
       type: "submit",
       disabled:
       /*$form*/

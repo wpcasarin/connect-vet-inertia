@@ -22,6 +22,7 @@
       class="space-y-1 px-2 pt-2 pb-3">
       {#if user}
         <MobileMenuLink to="/" text="home" />
+        <MobileMenuLink to="/my-pets" text="pets" />
         <MobileMenuLink to="/about" text="about" />
       {:else}
         <MobileMenuLink to="/login" text="login" />

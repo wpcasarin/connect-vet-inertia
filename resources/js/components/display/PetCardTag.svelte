@@ -5,12 +5,12 @@
 </script>
 
 <div
-  class="inline-flex rounded-md bg-indigo-200 p-4 text-neutral shadow-md hover:bg-indigo-300 lg:p-2">
-  <span class="aspect-square w-5">
+  class="flex items-center justify-start rounded-md bg-indigo-200 p-2 text-indigo-900 shadow-md hover:bg-indigo-300 md:p-4 lg:p-2">
+  <span class="aspect-square w-6 md:w-8 lg:w-6">
     <slot><FaLinux /></slot>
   </span>
   <p
-    class="truncate pl-2 text-lg font-medium lowercase first-letter:capitalize lg:text-sm">
+    class="text-md flex-grow truncate pl-2 font-medium lowercase first-letter:capitalize md:text-lg lg:text-sm">
     {text}
   </p>
 </div>

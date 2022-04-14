@@ -1,6 +1,32 @@
 <script>
+  import axios from 'axios';
+  import GiWhiteCat from 'svelte-icons/gi/GiWhiteCat.svelte';
+  import FaPlus from 'svelte-icons/fa/FaPlus.svelte';
+  import { Circle } from 'svelte-loading-spinners';
+  import { fly } from 'svelte/transition';
+  // local imports
+  import CenterAbsolute from '../components/util/CenterAbsolute.svelte';
   import Guests from '../layouts/Guests.svelte';
+  import PetsContainer from '../components/containers/PetsContainer.svelte';
   import PetCard from '../components/display/PetCard.svelte';
+  import AddPetButton from '../components/buttons/AddPetButton.svelte';
+  import { config } from '../config/axios';
+  // states
+  let delay = 0;
+  // methods
+  const updateDelay = () => (delay += 100);
+  const getPets = async () => {
+    try {
+      const resp = await axios.get('/pets', config);
+      if (resp.statusText === 'OK') {
+        return resp.data;
+      } else {
+        throw new Error(`HTTP error! status: ${resp.status}`);
+      }
+    } catch (error) {
+      return error.response;
+    }
+  };
 </script>
 
 <svelte:head>
@@ -8,14 +34,52 @@
 </svelte:head>
 
 <Guests>
-  <div
-    class="container-fluid mx-5 mt-10 min-h-screen px-4 sm:container sm:mx-auto sm:px-2">
-    <main class="flex flex-col gap-8 lg:grid lg:grid-cols-2 xl:grid-cols-3">
-      <PetCard />
-      <PetCard />
-      <PetCard />
-    </main>
-  </div>
+  <header
+    class="container-fluid mx-0 mt-10 flex justify-between gap-4 px-4 sm:container sm:mx-auto sm:flex-row">
+    <h1 class="flex items-center text-xl font-bold xs:text-2xl sm:text-3xl">
+      <span class="mr-2 aspect-square w-8 text-primary sm:w-10">
+        <GiWhiteCat />
+      </span>
+      All my buddies
+    </h1>
+    <AddPetButton />
+  </header>
+  <div class="container-fluid divider px-2 sm:container sm:mx-auto sm:px-4" />
+  <main
+    class="container-fluid mx-5 flex flex-grow flex-col px-2 sm:container sm:mx-auto sm:px-4">
+    <PetsContainer>
+      {#await getPets()}
+        <CenterAbsolute>
+          <Circle size="200" color="#1F2937" unit="px" duration="1s" />
+        </CenterAbsolute>
+      {:then pets}
+        {#if pets.length >= 1}
+          {#each pets as pet (pet.id)}
+            <div in:fly={{ x: -1000, duration: 1500, delay: updateDelay() }}>
+              <PetCard name={pet.name} specie={pet.specie} sex={pet.sex} />
+            </div>
+          {/each}
+        {:else}
+          <CenterAbsolute>
+            <h1
+              class="text-center font-bold sm:text-4xl text-2xl mb-6 text-primary">
+              Ops.. you not have any pets yet.
+            </h1>
+            <img
+              class="max-w-md"
+              src="/assets/no_data_illustration.svg"
+              alt="No pets found"
+              width="100%"
+              height="about" />
+          </CenterAbsolute>
+        {/if}
+      {:catch error}
+        <CenterAbsolute>
+          <div>{error}</div>
+        </CenterAbsolute>
+      {/await}
+    </PetsContainer>
+  </main>
 </Guests>
 
 <style>

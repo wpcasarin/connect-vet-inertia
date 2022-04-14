@@ -25,6 +25,7 @@
           {#if user}
             <ul class="flex space-x-4">
               <NavBarLink to="/" text="home" />
+              <NavBarLink to="/my-pets" text="pets" />
               <NavBarLink to="/about" text="about" />
             </ul>
           {/if}

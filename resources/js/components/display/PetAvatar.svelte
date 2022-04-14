@@ -1,10 +1,11 @@
 <script>
   export let name = 'Dog';
+  export let src;
 </script>
 
 <div class="avatar">
-  <div class="mask mask-squircle aspect-square h-fit max-h-36">
-    <img src="assets/dog_default.jpg" alt={name} />
+  <div class="mask mask-squircle aspect-square h-fit max-h-20 sm:max-h-36">
+    <img src={src} alt={name} />
   </div>
 </div>
 

@@ -11,7 +11,7 @@
     @inertiaHead
 </head>
 
-<body>
+<body class="scroll-smooth">
     @inertia
 </body>
 

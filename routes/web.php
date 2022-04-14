@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PetController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,8 +22,12 @@ Route::get('/', function () {
 Route::get('/about', function () {
     return Inertia::render('About', ["user" => Auth::user()]);
 });
-Route::get('/pets', function () {
-    return Inertia::render('Pets', ["user" => Auth::user()]);
+
+Route::middleware('auth')->group(function () {
+    Route::apiResource('pets', PetController::class);
+    Route::get('/my-pets', function () {
+        return Inertia::render('Pets', ["user" => Auth::user()]);
+    });
 });
 
 require __DIR__ . '/auth.php';

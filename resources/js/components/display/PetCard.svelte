@@ -4,6 +4,7 @@
   import GiMale from 'svelte-icons/gi/GiMale.svelte';
   import { draw } from 'svelte/transition';
   import { sineOut } from 'svelte/easing';
+  import { fly } from 'svelte/transition';
   // local imports
   import ModalConfirmation from './ModalConfirmation.svelte';
   import PetAvatar from './PetAvatar.svelte';
@@ -25,6 +26,7 @@
   text={`Are you sure you want to delete all ${name} data?`}
   method={() => handleDelete(id)} />
 <article
+  out:fly={{ duration: 500, x: -500 }}
   on:mouseleave={() => (buttonShow = false)}
   on:mouseover={() => (buttonShow = true)}
   on:focus={() => (buttonShow = true)}

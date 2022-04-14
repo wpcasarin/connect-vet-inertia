@@ -49,7 +49,7 @@
   <main
     class="container-fluid mx-5 flex flex-grow flex-col px-2 sm:container sm:mx-auto sm:px-4">
     <PetsContainer>
-      {#if $page['props']['pets'][0]}
+      {#if $page['props']['pets'] && $page['props']['pets'][0]}
         {#each $page['props']['pets'] as pet (pet.id)}
           <div in:fly={{ x: -1000, duration: 1500, delay: updateDelay() }}>
             <PetCard

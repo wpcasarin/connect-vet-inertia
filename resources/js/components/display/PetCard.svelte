@@ -1,12 +1,11 @@
 <script>
-  import axios from 'axios';
   import IoIosCalendar from 'svelte-icons/io/IoIosCalendar.svelte';
   import GiFemale from 'svelte-icons/gi/GiFemale.svelte';
   import GiMale from 'svelte-icons/gi/GiMale.svelte';
-  import { getContext } from 'svelte';
   import { draw } from 'svelte/transition';
   import { sineOut } from 'svelte/easing';
   // local imports
+  import ModalConfirmation from './ModalConfirmation.svelte';
   import PetAvatar from './PetAvatar.svelte';
   import PetCardTag from './PetCardTag.svelte';
   // props
@@ -14,26 +13,17 @@
   export let name;
   export let specie;
   export let sex;
-  // get context
-  let myPets = getContext('myPets');
-  let getPets = getContext('getPets');
+  export let handleDelete;
   // states
   let buttonShow = false;
-  // methods
-  const handleDelete = async () => {
-    try {
-      const resp = await axios.delete(`/pets/${id}`);
-      if (resp.statusText === 'OK') {
-        myPets = getPets();
-      } else {
-        throw new Error(`HTTP error! status: ${resp.status}`);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  let modalOpen = false;
 </script>
 
+<ModalConfirmation
+  bind:open={modalOpen}
+  title="Careful!"
+  text={`Are you sure you want to delete all ${name} data?`}
+  method={() => handleDelete(id)} />
 <article
   on:mouseleave={() => (buttonShow = false)}
   on:mouseover={() => (buttonShow = true)}
@@ -42,7 +32,7 @@
   class="relative flex items-center justify-center rounded-md bg-base-200 p-4 text-neutral transition-all hover:scale-105 focus:scale-105 md:p-8 lg:p-4 2xl:p-6">
   {#if buttonShow}
     <button
-      on:click={handleDelete}
+      on:click={() => (modalOpen = true)}
       type="button"
       class="btn btn-ghost btn-sm absolute top-3 right-3 aspect-square rounded-md p-0 hover:bg-base-300 hover:text-neutral sm:top-1 sm:right-1">
       <svg
@@ -98,7 +88,7 @@
   /* your styles go here */
   article {
     background-color: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(25px);
+    /* backdrop-filter: blur(25px); */
     min-width: 240px;
     min-height: 170px;
     box-shadow: 3px 3px 14px #cbced1, -3px -3px 14px #fff;

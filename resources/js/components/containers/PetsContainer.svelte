@@ -2,7 +2,9 @@
   // your script goes here
 </script>
 
-<section class="flex flex-col gap-8 lg:grid lg:grid-cols-2 xl:grid-cols-3">
+<section
+  id="pets-container"
+  class="flex flex-col gap-8 lg:grid lg:grid-cols-2 xl:grid-cols-3">
   <slot />
 </section>
 

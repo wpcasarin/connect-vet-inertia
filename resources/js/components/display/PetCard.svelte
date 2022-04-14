@@ -1,7 +1,9 @@
 <script>
+  import axios from 'axios';
   import IoIosCalendar from 'svelte-icons/io/IoIosCalendar.svelte';
   import GiFemale from 'svelte-icons/gi/GiFemale.svelte';
   import GiMale from 'svelte-icons/gi/GiMale.svelte';
+  import { getContext } from 'svelte';
   import { draw } from 'svelte/transition';
   import { sineOut } from 'svelte/easing';
   // local imports
@@ -12,8 +14,24 @@
   export let name;
   export let specie;
   export let sex;
+  // get context
+  let myPets = getContext('myPets');
+  let getPets = getContext('getPets');
   // states
   let buttonShow = false;
+  // methods
+  const handleDelete = async () => {
+    try {
+      const resp = await axios.delete(`/pets/${id}`);
+      if (resp.statusText === 'OK') {
+        myPets = getPets();
+      } else {
+        throw new Error(`HTTP error! status: ${resp.status}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 </script>
 
 <article
@@ -24,6 +42,7 @@
   class="relative flex items-center justify-center rounded-md bg-base-200 p-4 text-neutral transition-all hover:scale-105 focus:scale-105 md:p-8 lg:p-4 2xl:p-6">
   {#if buttonShow}
     <button
+      on:click={handleDelete}
       type="button"
       class="btn btn-ghost btn-sm absolute top-3 right-3 aspect-square rounded-md p-0 hover:bg-base-300 hover:text-neutral sm:top-1 sm:right-1">
       <svg

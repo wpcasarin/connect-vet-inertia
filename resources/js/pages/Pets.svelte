@@ -1,7 +1,7 @@
 <script>
   import axios from 'axios';
   import GiWhiteCat from 'svelte-icons/gi/GiWhiteCat.svelte';
-  import FaPlus from 'svelte-icons/fa/FaPlus.svelte';
+  import { setContext } from 'svelte';
   import { Circle } from 'svelte-loading-spinners';
   import { fly } from 'svelte/transition';
   // local imports
@@ -12,6 +12,7 @@
   import AddPetButton from '../components/buttons/AddPetButton.svelte';
   import { config } from '../config/axios';
   // states
+  $: myPets = getPets();
   let delay = 0;
   // methods
   const updateDelay = () => (delay += 100);
@@ -19,14 +20,17 @@
     try {
       const resp = await axios.get('/pets', config);
       if (resp.statusText === 'OK') {
-        return resp.data;
+        myPets = resp.data;
       } else {
         throw new Error(`HTTP error! status: ${resp.status}`);
       }
     } catch (error) {
-      return error.response;
+      console.error(error);
     }
   };
+  // set context
+  setContext('myPets', myPets);
+  setContext('getPets', getPets);
 </script>
 
 <svelte:head>
@@ -48,7 +52,7 @@
   <main
     class="container-fluid mx-5 flex flex-grow flex-col px-2 sm:container sm:mx-auto sm:px-4">
     <PetsContainer>
-      {#await getPets()}
+      {#await myPets}
         <CenterAbsolute>
           <Circle size="200" color="#1F2937" unit="px" duration="1s" />
         </CenterAbsolute>
@@ -56,7 +60,11 @@
         {#if pets.length >= 1}
           {#each pets as pet (pet.id)}
             <div in:fly={{ x: -1000, duration: 1500, delay: updateDelay() }}>
-              <PetCard name={pet.name} specie={pet.specie} sex={pet.sex} />
+              <PetCard
+                id={pet.id}
+                name={pet.name}
+                specie={pet.specie}
+                sex={pet.sex} />
             </div>
           {/each}
         {:else}

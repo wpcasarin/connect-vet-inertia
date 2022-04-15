@@ -4,7 +4,6 @@
   import GiMale from 'svelte-icons/gi/GiMale.svelte';
   import { draw } from 'svelte/transition';
   import { sineOut } from 'svelte/easing';
-  import { fly } from 'svelte/transition';
   // local imports
   import ModalConfirmation from './ModalConfirmation.svelte';
   import PetAvatar from './PetAvatar.svelte';
@@ -24,7 +23,7 @@
     try {
       const resp = await deletePet(petId);
       if (resp.status === 200) {
-        $petsStore = await getPets();
+        petsStore.set(await getPets());
       }
     } catch (error) {
       console.log(error);
@@ -39,7 +38,6 @@
   method={() => handlePetDelete(id)} />
 
 <article
-  out:fly={{ duration: 500, x: -500 }}
   on:mouseleave={() => (buttonShow = false)}
   on:mouseover={() => (buttonShow = true)}
   on:focus={() => (buttonShow = true)}
@@ -78,7 +76,9 @@
         <h2 class="truncate text-3xl font-bold xl:text-2xl">
           {name}
         </h2>
-        <p class="text-lg text-gray-400">{specie === 'CAT' ? 'Cat' : 'Dog'}</p>
+        <p class="text-lg text-gray-400">
+          {specie === 'CAT' ? 'Cat' : 'Dog'}
+        </p>
       </div>
     </div>
 

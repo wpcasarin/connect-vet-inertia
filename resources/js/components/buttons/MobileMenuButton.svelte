@@ -1,15 +1,9 @@
 <script>
   // local imports
   import { mobileMenuOpen } from '../../stores';
-  // states
-  let open;
-  // stores
-  mobileMenuOpen.subscribe((value) => {
-    open = value;
-  });
   // methods
   const handleClick = () => {
-    mobileMenuOpen.set(!open);
+    mobileMenuOpen.set(!$mobileMenuOpen);
   };
 </script>
 
@@ -20,7 +14,7 @@
   aria-expanded="false"
   on:click={handleClick}>
   <span class="sr-only">Open main menu</span>
-  {#if !open}
+  {#if !$mobileMenuOpen}
     <svg
       class="block h-6 w-6"
       xmlns="http://www.w3.org/2000/svg"

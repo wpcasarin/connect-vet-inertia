@@ -10,14 +10,14 @@
   import AddPetButton from '../components/buttons/AddPetButton.svelte';
   import { petsStore } from '../stores';
   import { getPets } from '../libs/pets';
-  import { onDestroy, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   // states
   let delay = 0;
   // methods
   const updateDelay = () => (delay += 100);
   // lifecycle
   onMount(async () => {
-    $petsStore = await getPets();
+    petsStore.set(await getPets());
   });
 </script>
 
@@ -43,7 +43,9 @@
       {#if $petsStore}
         {#if $petsStore.length >= 1}
           {#each $petsStore as pet (pet.id)}
-            <div in:fly={{ x: -1000, duration: 1500, delay: updateDelay() }}>
+            <div
+              in:fly={{ x: -1000, duration: 1500, delay: updateDelay() }}
+              out:fly|local={{ duration: 500, x: -500 }}>
               <PetCard
                 id={pet.id}
                 name={pet.name}

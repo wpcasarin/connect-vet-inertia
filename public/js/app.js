@@ -13547,7 +13547,7 @@ function create_else_block(ctx) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(svg);
     }
   };
-} // (23:2) {#if !open}
+} // (17:2) {#if !$mobileMenuOpen}
 
 
 function create_if_block(ctx) {
@@ -13587,7 +13587,7 @@ function create_fragment(ctx) {
 
   function select_block_type(ctx, dirty) {
     if (!
-    /*open*/
+    /*$mobileMenuOpen*/
     ctx[0]) return create_if_block;
     return create_else_block;
   }
@@ -13646,17 +13646,16 @@ function create_fragment(ctx) {
 }
 
 function instance($$self, $$props, $$invalidate) {
-  var open; // stores
-
-  _stores__WEBPACK_IMPORTED_MODULE_1__.mobileMenuOpen.subscribe(function (value) {
-    $$invalidate(0, open = value);
-  }); // methods
+  var $mobileMenuOpen;
+  (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.component_subscribe)($$self, _stores__WEBPACK_IMPORTED_MODULE_1__.mobileMenuOpen, function ($$value) {
+    return $$invalidate(0, $mobileMenuOpen = $$value);
+  });
 
   var handleClick = function handleClick() {
-    _stores__WEBPACK_IMPORTED_MODULE_1__.mobileMenuOpen.set(!open);
+    _stores__WEBPACK_IMPORTED_MODULE_1__.mobileMenuOpen.set(!$mobileMenuOpen);
   };
 
-  return [open, handleClick];
+  return [$mobileMenuOpen, handleClick];
 }
 
 var MobileMenuButton = /*#__PURE__*/function (_SvelteComponent) {
@@ -15475,7 +15474,6 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
-
  // local imports
 
 
@@ -15486,7 +15484,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function add_css(target) {
   (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.append_styles)(target, "svelte-1p1m94c", "article.svelte-1p1m94c{background-color:rgba(255, 255, 255, 0.7);min-width:240px;min-height:170px;box-shadow:3px 3px 14px #cbced1, -3px -3px 14px #fff}");
-} // (48:2) {#if buttonShow}
+} // (46:2) {#if buttonShow}
 
 
 function create_if_block_1(ctx) {
@@ -15746,7 +15744,6 @@ function create_fragment(ctx) {
   var t7;
   var current_block_type_index;
   var if_block1;
-  var article_outro;
   var current;
   var mounted;
   var dispose;
@@ -15959,7 +15956,7 @@ function create_fragment(ctx) {
 
       if (dirty &
       /*$$scope*/
-      32768) {
+      16384) {
         petcardtag_changes.$$scope = {
           dirty: dirty,
           ctx: ctx
@@ -15994,7 +15991,6 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(petavatar.$$.fragment, local);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(petcardtag.$$.fragment, local);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(if_block1);
-      if (article_outro) article_outro.end(1);
       current = true;
     },
     o: function o(local) {
@@ -16003,10 +15999,6 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(petavatar.$$.fragment, local);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(petcardtag.$$.fragment, local);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(if_block1);
-      article_outro = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_out_transition)(article, svelte_transition__WEBPACK_IMPORTED_MODULE_5__.fly, {
-        duration: 500,
-        x: -500
-      });
       current = false;
     },
     d: function d(detaching) {
@@ -16017,7 +16009,6 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(petavatar);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(petcardtag);
       if_blocks[current_block_type_index].d();
-      if (detaching && article_outro) article_outro.end();
       mounted = false;
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.run_all)(dispose);
     }
@@ -16025,10 +16016,6 @@ function create_fragment(ctx) {
 }
 
 function instance($$self, $$props, $$invalidate) {
-  var $petsStore;
-  (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.component_subscribe)($$self, _stores__WEBPACK_IMPORTED_MODULE_10__.petsStore, function ($$value) {
-    return $$invalidate(14, $petsStore = $$value);
-  });
   var id = $$props.id;
   var name = $$props.name;
   var specie = $$props.specie;
@@ -16052,35 +16039,34 @@ function instance($$self, $$props, $$invalidate) {
               resp = _context.sent;
 
               if (!(resp.status === 200)) {
-                _context.next = 12;
+                _context.next = 10;
                 break;
               }
 
-              _context.t0 = svelte_internal__WEBPACK_IMPORTED_MODULE_1__.set_store_value;
-              _context.t1 = _stores__WEBPACK_IMPORTED_MODULE_10__.petsStore;
-              _context.next = 9;
+              _context.t0 = _stores__WEBPACK_IMPORTED_MODULE_10__.petsStore;
+              _context.next = 8;
               return (0,_libs_pets__WEBPACK_IMPORTED_MODULE_11__.getPets)();
 
-            case 9:
-              _context.t2 = $petsStore = _context.sent;
-              _context.t3 = $petsStore;
-              (0, _context.t0)(_context.t1, _context.t2, _context.t3);
+            case 8:
+              _context.t1 = _context.sent;
 
-            case 12:
-              _context.next = 17;
+              _context.t0.set.call(_context.t0, _context.t1);
+
+            case 10:
+              _context.next = 15;
               break;
 
-            case 14:
-              _context.prev = 14;
-              _context.t4 = _context["catch"](0);
-              console.log(_context.t4);
+            case 12:
+              _context.prev = 12;
+              _context.t2 = _context["catch"](0);
+              console.log(_context.t2);
 
-            case 17:
+            case 15:
             case "end":
               return _context.stop();
           }
         }
-      }, _callee, null, [[0, 14]]);
+      }, _callee, null, [[0, 12]]);
     }));
 
     return function handlePetDelete(_x) {
@@ -23449,7 +23435,7 @@ function get_each_context(ctx, list, i) {
   var child_ctx = ctx.slice();
   child_ctx[3] = list[i];
   return child_ctx;
-} // (68:6) {:else}
+} // (70:6) {:else}
 
 
 function create_else_block_1(ctx) {
@@ -23569,7 +23555,7 @@ function create_if_block(ctx) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(if_block_anchor);
     }
   };
-} // (69:8) <CenterAbsolute>
+} // (71:8) <CenterAbsolute>
 
 
 function create_default_slot_3(ctx) {
@@ -23605,7 +23591,7 @@ function create_default_slot_3(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(circle, detaching);
     }
   };
-} // (54:8) {:else}
+} // (56:8) {:else}
 
 
 function create_else_block(ctx) {
@@ -23733,7 +23719,7 @@ function create_if_block_1(ctx) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(each_1_anchor);
     }
   };
-} // (55:10) <CenterAbsolute>
+} // (57:10) <CenterAbsolute>
 
 
 function create_default_slot_2(ctx) {
@@ -23774,6 +23760,7 @@ function create_each_block(key_1, ctx) {
   var petcard;
   var t;
   var div_intro;
+  var div_outro;
   var current;
   petcard = new _components_display_PetCard_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({
     props: {
@@ -23834,29 +23821,36 @@ function create_each_block(key_1, ctx) {
     i: function i(local) {
       if (current) return;
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_in)(petcard.$$.fragment, local);
-
-      if (!div_intro) {
-        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_render_callback)(function () {
-          div_intro = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_in_transition)(div, svelte_transition__WEBPACK_IMPORTED_MODULE_4__.fly, {
-            x: -1000,
-            duration: 1500,
-            delay:
-            /*updateDelay*/
-            ctx[1]()
-          });
-          div_intro.start();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.add_render_callback)(function () {
+        if (div_outro) div_outro.end(1);
+        div_intro = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_in_transition)(div, svelte_transition__WEBPACK_IMPORTED_MODULE_4__.fly, {
+          x: -1000,
+          duration: 1500,
+          delay:
+          /*updateDelay*/
+          ctx[1]()
         });
-      }
-
+        div_intro.start();
+      });
       current = true;
     },
     o: function o(local) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.transition_out)(petcard.$$.fragment, local);
+      if (div_intro) div_intro.invalidate();
+
+      if (local) {
+        div_outro = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.create_out_transition)(div, svelte_transition__WEBPACK_IMPORTED_MODULE_4__.fly, {
+          duration: 500,
+          x: -500
+        });
+      }
+
       current = false;
     },
     d: function d(detaching) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(div);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(petcard);
+      if (detaching && div_outro) div_outro.end();
     }
   };
 } // (42:4) <PetsContainer>
@@ -24107,17 +24101,16 @@ function instance($$self, $$props, $$invalidate) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            _context.t0 = svelte_internal__WEBPACK_IMPORTED_MODULE_1__.set_store_value;
-            _context.t1 = _stores__WEBPACK_IMPORTED_MODULE_10__.petsStore;
-            _context.next = 4;
+            _context.t0 = _stores__WEBPACK_IMPORTED_MODULE_10__.petsStore;
+            _context.next = 3;
             return (0,_libs_pets__WEBPACK_IMPORTED_MODULE_11__.getPets)();
 
-          case 4:
-            _context.t2 = $petsStore = _context.sent;
-            _context.t3 = $petsStore;
-            (0, _context.t0)(_context.t1, _context.t2, _context.t3);
+          case 3:
+            _context.t1 = _context.sent;
 
-          case 7:
+            _context.t0.set.call(_context.t0, _context.t1);
+
+          case 5:
           case "end":
             return _context.stop();
         }

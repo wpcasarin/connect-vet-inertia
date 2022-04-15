@@ -2,7 +2,7 @@
   export let text = '';
 </script>
 
-<div class="form-control mb-6 gap-2">
+<div class="form-control gap-2">
   <h1 class="text-3xl font-extrabold text-base-content">
     {text}
   </h1>

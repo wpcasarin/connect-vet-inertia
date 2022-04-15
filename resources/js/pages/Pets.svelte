@@ -3,14 +3,15 @@
   import { Circle } from 'svelte-loading-spinners';
   import { fly } from 'svelte/transition';
   // local imports
+  import AddNewPetModal from '../components/display/AddNewPetModal.svelte';
   import CenterAbsolute from '../components/util/CenterAbsolute.svelte';
   import Guests from '../layouts/Guests.svelte';
   import PetsContainer from '../components/containers/PetsContainer.svelte';
   import PetCard from '../components/display/PetCard.svelte';
-  import AddPetButton from '../components/buttons/AddPetButton.svelte';
   import { petsStore } from '../stores';
   import { getPets } from '../libs/pets';
   import { onMount } from 'svelte';
+
   // states
   let delay = 0;
   // methods
@@ -34,7 +35,7 @@
       </span>
       All my buddies
     </h1>
-    <AddPetButton />
+    <AddNewPetModal />
   </header>
   <div class="container-fluid divider px-2 sm:container sm:mx-auto sm:px-4" />
   <main

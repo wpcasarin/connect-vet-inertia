@@ -25,7 +25,7 @@
   };
 </script>
 
-<Form handleSubmit={handleSubmit}>
+<header class="mb-6">
   <!-- logo -->
   <FormLogo />
   <!-- header -->
@@ -41,7 +41,9 @@
       </a>
     </p>
   </FormHeader>
+</header>
 
+<Form handleSubmit={handleSubmit}>
   <!-- email input -->
   <InputGroup>
     <FormInput

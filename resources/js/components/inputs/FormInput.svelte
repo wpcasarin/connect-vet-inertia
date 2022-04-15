@@ -25,7 +25,7 @@
     type={type}
     value={value}
     placeholder={placeholder}
-    class={`input input-bordered ${error && 'input-error'}`}
+    class={`input input-bordered w-full ${error && 'input-error'}`}
     on:input={handleInput} />
 </div>
 

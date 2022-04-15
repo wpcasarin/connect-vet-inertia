@@ -22,12 +22,14 @@
   };
 </script>
 
-<Form handleSubmit={handleSubmit}>
+<header class="mb-6">
   <!-- logo -->
   <FormLogo />
   <!-- header -->
   <FormHeader text="Reset your password" />
+</header>
 
+<Form handleSubmit={handleSubmit}>
   <!-- email input -->
   <FormInput
     readonly={true}

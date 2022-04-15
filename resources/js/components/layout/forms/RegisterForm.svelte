@@ -42,7 +42,7 @@
   };
 </script>
 
-<Form handleSubmit={handleSubmit}>
+<header class="mb-6">
   <!-- logo -->
   <FormLogo />
   <!-- header -->
@@ -58,7 +58,9 @@
   <SocialButtonGroup text="Sign up with" />
   <!-- divider -->
   <FormDivider text="Or continue with" />
+</header>
 
+<Form handleSubmit={handleSubmit}>
   <!-- input group 1 -->
   <InputGroup>
     <!-- name input -->

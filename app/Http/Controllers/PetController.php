@@ -7,6 +7,7 @@ use App\Models\Pet;
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class PetController extends Controller
 {
@@ -67,10 +68,11 @@ class PetController extends Controller
         ]);
 
         if ($petNew) {
-            return response([
-                'message' => 'Pet added successfully.',
-                'pet' => $petNew
-            ], Response::HTTP_CREATED);
+            return Inertia::location('/my-pets');
+            // return response([
+            //     'message' => 'Pet added successfully.',
+            //     'pet' => $petNew
+            // ], Response::HTTP_CREATED);
         } else {
             return response([
                 'message' => 'Pet registration failed.'

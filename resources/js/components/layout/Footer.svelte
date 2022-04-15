@@ -6,7 +6,9 @@
   const footerYear = new Date().getFullYear();
 </script>
 
-<div class="mt-10 bg-neutral text-neutral-content">
+<div
+  class="
+bg-neutral text-neutral-content">
   <footer class="container-fluid footer mx-auto items-center p-4 sm:container">
     <div class="grid-flow-col items-center">
       <svg

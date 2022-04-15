@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pet;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -89,11 +90,12 @@ class PetController extends Controller
     public function show(Request $request, Pet $pet)
     {
         if ($request->user()->cannot('view', $pet)) {
-            return response([
-                'message' => 'Unauthorized.'
-            ], Response::HTTP_UNAUTHORIZED);
+            return Inertia::location('/my-pets');
+            // return response([
+            //     'message' => 'Unauthorized.'
+            // ], Response::HTTP_UNAUTHORIZED);
         }
-        return $pet;
+        return Inertia::render('PetProfile', ["user" => Auth::user(), "pet" => $pet]);
     }
 
     /**
@@ -124,9 +126,10 @@ class PetController extends Controller
 
         $pet->update($request->all());
 
-        return response([
-            'message' => 'Pet update successfully.'
-        ], Response::HTTP_OK);
+        // return response([
+        //     'message' => 'Pet update successfully.'
+        // ], Response::HTTP_OK);
+        return Inertia::location("/pets/$pet->id");
     }
 
     /**

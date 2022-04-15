@@ -88,9 +88,10 @@
   <!-- form buttons -->
   <div class="py-4 sm:flex sm:flex-row-reverse">
     <button
+      disabled={$form.processing}
       on:click={handleSubmit}
       type="button"
-      class="inline-flex w-full justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-primary-focus focus:outline-none focus:ring-2 focus:ring-primary-focus focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+      class="inline-flex w-full justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-primary-focus focus:outline-none focus:ring-2 focus:ring-primary-focus focus:ring-offset-2 disabled:bg-slate-500 disabled:text-slate-300 sm:ml-3 sm:w-auto sm:text-sm"
       >Confirm</button>
     <button
       on:click={handleCancel}

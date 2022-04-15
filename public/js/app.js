@@ -17579,6 +17579,8 @@ function create_fragment(ctx) {
   var inertia_action;
   var t7;
   var div1;
+  var a1;
+  var inertia_action_1;
   var div2_intro;
   var t9;
   var img;
@@ -17603,7 +17605,8 @@ function create_fragment(ctx) {
       a0.textContent = "Get started";
       t7 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
       div1 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("div");
-      div1.innerHTML = "<a href=\"/about\" class=\"flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-100 px-8 py-3 text-base font-medium text-indigo-700 hover:bg-indigo-200 md:py-4 md:px-10 md:text-lg\">Learn more</a>";
+      a1 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("a");
+      a1.textContent = "Learn more";
       t9 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
       img = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("img");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(h1, "class", "text-4xl font-extrabold tracking-tight text-neutral sm:text-5xl md:text-6xl");
@@ -17611,6 +17614,8 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a0, "href", "/register");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a0, "class", "flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 md:py-4 md:px-10 md:text-lg");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div0, "class", "rounded-md shadow");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a1, "href", "/about");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(a1, "class", "flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-100 px-8 py-3 text-base font-medium text-indigo-700 hover:bg-indigo-200 md:py-4 md:px-10 md:text-lg");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div1, "class", "mt-3 sm:mt-0 sm:ml-3");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div2, "class", "mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div3, "class", "sm:text-center lg:text-left");
@@ -17633,11 +17638,12 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div0, a0);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div2, t7);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div2, div1);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(div1, a1);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(section, t9);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(section, img);
 
       if (!mounted) {
-        dispose = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.action_destroyer)(inertia_action = _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_1__.inertia.call(null, a0));
+        dispose = [(0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.action_destroyer)(inertia_action = _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_1__.inertia.call(null, a0)), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.action_destroyer)(inertia_action_1 = _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_1__.inertia.call(null, a1))];
         mounted = true;
       }
     },
@@ -17704,7 +17710,7 @@ function create_fragment(ctx) {
     d: function d(detaching) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(section);
       mounted = false;
-      dispose();
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.run_all)(dispose);
     }
   };
 }

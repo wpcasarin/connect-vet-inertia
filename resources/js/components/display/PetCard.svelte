@@ -43,7 +43,7 @@
   on:mouseover={() => (buttonShow = true)}
   on:focus={() => (buttonShow = true)}
   on:blur={() => (buttonShow = false)}
-  class="relative flex cursor-pointer items-center justify-center rounded-md bg-base-200 p-4 text-neutral transition-all hover:scale-105 focus:scale-105 md:p-8 lg:p-4 2xl:p-6">
+  class="relative flex items-center justify-center rounded-md bg-base-200 p-4 text-neutral transition-all hover:scale-105 focus:scale-105 md:p-8 lg:p-4 2xl:p-6">
   {#if buttonShow}
     <button
       on:click={() => (modalOpen = true)}
@@ -67,7 +67,7 @@
 
   <div
     use:inertia={{ href: `/pets/${id}` }}
-    class="flex flex-grow flex-col gap-4 sm:grid sm:grid-cols-12">
+    class="flex flex-grow cursor-pointer flex-col gap-4 sm:grid sm:grid-cols-12">
     <div class="flex gap-x-4 sm:col-span-7 sm:grid sm:grid-cols-12">
       <div class="col-span-5">
         <PetAvatar

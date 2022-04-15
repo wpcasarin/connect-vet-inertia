@@ -17217,8 +17217,8 @@ function create_fragment(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(div1, "class", "col-span-7 flex flex-grow flex-col justify-center");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(div2, "class", "flex gap-x-4 sm:col-span-7 sm:grid sm:grid-cols-12");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(div3, "class", "col-span-5 grid content-center gap-3 sm:col-span-5");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(div4, "class", "flex flex-grow flex-col gap-4 sm:grid sm:grid-cols-12");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(article, "class", "relative flex cursor-pointer items-center justify-center rounded-md bg-base-200 p-4 text-neutral transition-all hover:scale-105 focus:scale-105 md:p-8 lg:p-4 2xl:p-6 svelte-1p1m94c");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(div4, "class", "flex flex-grow cursor-pointer flex-col gap-4 sm:grid sm:grid-cols-12");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.attr)(article, "class", "relative flex items-center justify-center rounded-md bg-base-200 p-4 text-neutral transition-all hover:scale-105 focus:scale-105 md:p-8 lg:p-4 2xl:p-6 svelte-1p1m94c");
     },
     m: function m(target, anchor) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.mount_component)(modalconfirmation, target, anchor);

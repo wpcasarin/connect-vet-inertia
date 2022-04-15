@@ -26,7 +26,7 @@ Route::get('/about', function () {
 Route::middleware('auth')->group(function () {
     Route::apiResource('pets', PetController::class);
     Route::get('/my-pets', function () {
-        return Inertia::render('Pets', ["user" => Auth::user(), "pets" => Auth::user()->pets]);
+        return Inertia::render('Pets', ["user" => Auth::user()]);
     });
 });
 

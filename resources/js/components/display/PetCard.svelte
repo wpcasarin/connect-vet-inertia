@@ -9,22 +9,35 @@
   import ModalConfirmation from './ModalConfirmation.svelte';
   import PetAvatar from './PetAvatar.svelte';
   import PetCardTag from './PetCardTag.svelte';
+  import { petsStore } from '../../stores';
+  import { deletePet, getPets } from '../../libs/pets';
   // props
   export let id;
   export let name;
   export let specie;
   export let sex;
-  export let handleDelete;
   // states
   let buttonShow = false;
   let modalOpen = false;
+  // methods
+  const handlePetDelete = async (petId) => {
+    try {
+      const resp = await deletePet(petId);
+      if (resp.status === 200) {
+        $petsStore = await getPets();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 </script>
 
 <ModalConfirmation
   bind:open={modalOpen}
   title="Careful!"
   text={`Are you sure you want to delete all ${name} data?`}
-  method={() => handleDelete(id)} />
+  method={() => handlePetDelete(id)} />
+
 <article
   out:fly={{ duration: 500, x: -500 }}
   on:mouseleave={() => (buttonShow = false)}

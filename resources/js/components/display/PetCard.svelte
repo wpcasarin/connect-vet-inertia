@@ -16,6 +16,7 @@
   export let name;
   export let specie;
   export let sex;
+  export let dob;
   // states
   let buttonShow = false;
   let modalOpen = false;
@@ -30,6 +31,15 @@
       console.log(error);
     }
   };
+  const calcAge = (date) => {
+    const dob = new Date(date);
+    const monthDiff = Date.now() - dob.getTime();
+    const ageDate = new Date(monthDiff);
+    const year = ageDate.getUTCFullYear();
+    return Math.abs(year - 1970);
+  };
+  // const
+  const age = calcAge(dob);
 </script>
 
 <ModalConfirmation
@@ -86,7 +96,7 @@
     </div>
 
     <div class="col-span-5 grid content-center gap-3 sm:col-span-5">
-      <PetCardTag>
+      <PetCardTag text={age <= 1 ? `${age} year old` : `${age} years old`}>
         <IoIosCalendar />
       </PetCardTag>
       {#if sex === 'F'}

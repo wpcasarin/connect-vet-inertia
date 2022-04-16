@@ -18,12 +18,13 @@ class Pet extends Model
         'date_of_birth',
     ];
 
-    protected $hidden = [
-        'user_id'
-    ];
-
     public function tutor()
     {
         return $this->belongsTo(Tutor::class);
+    }
+
+    public function vet()
+    {
+        return $this->hasOne(Vet::class);
     }
 }

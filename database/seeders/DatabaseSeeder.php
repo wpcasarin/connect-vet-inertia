@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
         \App\Models\Tutor::factory(3)
             ->hasPets(10)
             ->create();
-        \App\Models\Vet::factory(5)->create();
+        \App\Models\Vet::factory(1)
+            // ->hasPatients(1)
+            ->create();
     }
 }

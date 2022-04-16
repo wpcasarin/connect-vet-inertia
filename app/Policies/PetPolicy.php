@@ -18,7 +18,7 @@ class PetPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->type === 'ADMIN' || $user->type === 'TUTOR' ?  true :  false;
+        return $user->type === 'VET' || $user->type === 'TUTOR' ?  true :  false;
     }
 
     /**
@@ -30,7 +30,12 @@ class PetPolicy
      */
     public function view(User $user, Pet $pet)
     {
-        return $user->id === $pet->user_id;
+        if ($user->type === 'TUTOR') {
+            return $user->id === $pet->user_id;
+        }
+        if ($user->type === 'VET') {
+            return $user->id === $pet->vet_id;
+        }
     }
 
     /**

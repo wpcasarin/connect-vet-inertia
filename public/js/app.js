@@ -16860,7 +16860,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function add_css(target) {
   (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.append_styles)(target, "svelte-1p1m94c", "article.svelte-1p1m94c{background-color:rgba(255, 255, 255, 0.7);min-width:240px;min-height:170px;box-shadow:3px 3px 14px #cbced1, -3px -3px 14px #fff}");
-} // (47:2) {#if buttonShow}
+} // (57:2) {#if buttonShow}
 
 
 function create_if_block_1(ctx) {
@@ -16897,7 +16897,7 @@ function create_if_block_1(ctx) {
       if (!mounted) {
         dispose = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.listen)(button, "click",
         /*click_handler*/
-        ctx[9]);
+        ctx[11]);
         mounted = true;
       }
     },
@@ -16932,7 +16932,7 @@ function create_if_block_1(ctx) {
       dispose();
     }
   };
-} // (89:6) <PetCardTag>
+} // (99:6) <PetCardTag text={age <= 1 ? `${age} year old` : `${age} years old`}>
 
 
 function create_default_slot_2(ctx) {
@@ -16960,7 +16960,7 @@ function create_default_slot_2(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(ioioscalendar, detaching);
     }
   };
-} // (96:6) {:else}
+} // (106:6) {:else}
 
 
 function create_else_block(ctx) {
@@ -16998,7 +16998,7 @@ function create_else_block(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(petcardtag, detaching);
     }
   };
-} // (92:6) {#if sex === 'F'}
+} // (102:6) {#if sex === 'F'}
 
 
 function create_if_block(ctx) {
@@ -17036,7 +17036,7 @@ function create_if_block(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(petcardtag, detaching);
     }
   };
-} // (97:8) <PetCardTag text={'Male'}>
+} // (107:8) <PetCardTag text={'Male'}>
 
 
 function create_default_slot_1(ctx) {
@@ -17064,7 +17064,7 @@ function create_default_slot_1(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(gimale, detaching);
     }
   };
-} // (93:8) <PetCardTag text={'Female'}>
+} // (103:8) <PetCardTag text={'Female'}>
 
 
 function create_default_slot(ctx) {
@@ -17127,7 +17127,7 @@ function create_fragment(ctx) {
 
   function modalconfirmation_open_binding(value) {
     /*modalconfirmation_open_binding*/
-    ctx[8](value);
+    ctx[10](value);
   }
 
   var modalconfirmation_props = {
@@ -17137,7 +17137,7 @@ function create_fragment(ctx) {
     ctx[1], " data?"),
     method:
     /*func*/
-    ctx[7]
+    ctx[9]
   };
 
   if (
@@ -17166,6 +17166,13 @@ function create_fragment(ctx) {
   });
   petcardtag = new _PetCardTag_svelte__WEBPACK_IMPORTED_MODULE_10__["default"]({
     props: {
+      text:
+      /*age*/
+      ctx[7] <= 1 ? "".concat(
+      /*age*/
+      ctx[7], " year old") : "".concat(
+      /*age*/
+      ctx[7], " years old"),
       $$slots: {
         "default": [create_default_slot_2]
       },
@@ -17251,13 +17258,13 @@ function create_fragment(ctx) {
           ctx[0])
         })), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.listen)(article, "mouseleave",
         /*mouseleave_handler*/
-        ctx[10]), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.listen)(article, "mouseover",
+        ctx[12]), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.listen)(article, "mouseover",
         /*mouseover_handler*/
-        ctx[11]), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.listen)(article, "focus",
+        ctx[13]), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.listen)(article, "focus",
         /*focus_handler*/
-        ctx[12]), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.listen)(article, "blur",
+        ctx[14]), (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.listen)(article, "blur",
         /*blur_handler*/
-        ctx[13])];
+        ctx[15])];
         mounted = true;
       }
     },
@@ -17275,7 +17282,7 @@ function create_fragment(ctx) {
       /*id*/
       1) modalconfirmation_changes.method =
       /*func*/
-      ctx[7];
+      ctx[9];
 
       if (!updating_open && dirty &
       /*modalOpen*/
@@ -17337,7 +17344,7 @@ function create_fragment(ctx) {
 
       if (dirty &
       /*$$scope*/
-      16384) {
+      131072) {
         petcardtag_changes.$$scope = {
           dirty: dirty,
           ctx: ctx
@@ -17408,7 +17415,8 @@ function instance($$self, $$props, $$invalidate) {
   var id = $$props.id;
   var name = $$props.name;
   var specie = $$props.specie;
-  var sex = $$props.sex; // states
+  var sex = $$props.sex;
+  var dob = $$props.dob; // states
 
   var buttonShow = false;
   var modalOpen = false; // methods
@@ -17463,6 +17471,17 @@ function instance($$self, $$props, $$invalidate) {
     };
   }();
 
+  var calcAge = function calcAge(date) {
+    var dob = new Date(date);
+    var monthDiff = Date.now() - dob.getTime();
+    var ageDate = new Date(monthDiff);
+    var year = ageDate.getUTCFullYear();
+    return Math.abs(year - 1970);
+  }; // const
+
+
+  var age = calcAge(dob);
+
   var func = function func() {
     return handlePetDelete(id);
   };
@@ -17497,9 +17516,10 @@ function instance($$self, $$props, $$invalidate) {
     if ('name' in $$props) $$invalidate(1, name = $$props.name);
     if ('specie' in $$props) $$invalidate(2, specie = $$props.specie);
     if ('sex' in $$props) $$invalidate(3, sex = $$props.sex);
+    if ('dob' in $$props) $$invalidate(8, dob = $$props.dob);
   };
 
-  return [id, name, specie, sex, buttonShow, modalOpen, handlePetDelete, func, modalconfirmation_open_binding, click_handler, mouseleave_handler, mouseover_handler, focus_handler, blur_handler];
+  return [id, name, specie, sex, buttonShow, modalOpen, handlePetDelete, age, dob, func, modalconfirmation_open_binding, click_handler, mouseleave_handler, mouseover_handler, focus_handler, blur_handler];
 }
 
 var PetCard = /*#__PURE__*/function (_SvelteComponent) {
@@ -17517,7 +17537,8 @@ var PetCard = /*#__PURE__*/function (_SvelteComponent) {
       id: 0,
       name: 1,
       specie: 2,
-      sex: 3
+      sex: 3,
+      dob: 8
     }, add_css);
     return _this;
   }
@@ -19391,9 +19412,10 @@ function create_if_block_2(ctx) {
   var ul;
   var navbarlink0;
   var t0;
-  var navbarlink1;
+  var current_block_type_index;
+  var if_block;
   var t1;
-  var navbarlink2;
+  var navbarlink1;
   var current;
   navbarlink0 = new _buttons_NavBarLink_svelte__WEBPACK_IMPORTED_MODULE_1__["default"]({
     props: {
@@ -19401,13 +19423,19 @@ function create_if_block_2(ctx) {
       text: "home"
     }
   });
+  var if_block_creators = [create_if_block_3, create_else_block];
+  var if_blocks = [];
+
+  function select_block_type(ctx, dirty) {
+    if (
+    /*user*/
+    ctx[0].type === 'TUTOR') return 0;
+    return 1;
+  }
+
+  current_block_type_index = select_block_type(ctx, -1);
+  if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
   navbarlink1 = new _buttons_NavBarLink_svelte__WEBPACK_IMPORTED_MODULE_1__["default"]({
-    props: {
-      to: "/my-pets",
-      text: "pets"
-    }
-  });
-  navbarlink2 = new _buttons_NavBarLink_svelte__WEBPACK_IMPORTED_MODULE_1__["default"]({
     props: {
       to: "/about",
       text: "about"
@@ -19418,41 +19446,128 @@ function create_if_block_2(ctx) {
       ul = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("ul");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(navbarlink0.$$.fragment);
       t0 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(navbarlink1.$$.fragment);
+      if_block.c();
       t1 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(navbarlink2.$$.fragment);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(navbarlink1.$$.fragment);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(ul, "class", "flex space-x-4");
     },
     m: function m(target, anchor) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, ul, anchor);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(navbarlink0, ul, null);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(ul, t0);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(navbarlink1, ul, null);
+      if_blocks[current_block_type_index].m(ul, null);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append)(ul, t1);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(navbarlink2, ul, null);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(navbarlink1, ul, null);
       current = true;
+    },
+    p: function p(ctx, dirty) {
+      var previous_block_index = current_block_type_index;
+      current_block_type_index = select_block_type(ctx, dirty);
+
+      if (current_block_type_index !== previous_block_index) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_blocks[previous_block_index], 1, 1, function () {
+          if_blocks[previous_block_index] = null;
+        });
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
+        if_block = if_blocks[current_block_type_index];
+
+        if (!if_block) {
+          if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+          if_block.c();
+        } else {}
+
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block, 1);
+        if_block.m(ul, t1);
+      }
     },
     i: function i(local) {
       if (current) return;
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(navbarlink0.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(navbarlink1.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(navbarlink2.$$.fragment, local);
       current = true;
     },
     o: function o(local) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(navbarlink0.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(navbarlink1.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(navbarlink2.$$.fragment, local);
       current = false;
     },
     d: function d(detaching) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(ul);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(navbarlink0);
+      if_blocks[current_block_type_index].d();
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(navbarlink1);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(navbarlink2);
     }
   };
-} // (37:8) {#if !user}
+} // (30:14) {:else}
+
+
+function create_else_block(ctx) {
+  var navbarlink;
+  var current;
+  navbarlink = new _buttons_NavBarLink_svelte__WEBPACK_IMPORTED_MODULE_1__["default"]({
+    props: {
+      to: "/my-pets",
+      text: "patients"
+    }
+  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(navbarlink.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(navbarlink, target, anchor);
+      current = true;
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(navbarlink.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(navbarlink.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(navbarlink, detaching);
+    }
+  };
+} // (28:14) {#if user.type === 'TUTOR'}
+
+
+function create_if_block_3(ctx) {
+  var navbarlink;
+  var current;
+  navbarlink = new _buttons_NavBarLink_svelte__WEBPACK_IMPORTED_MODULE_1__["default"]({
+    props: {
+      to: "/my-pets",
+      text: "pets"
+    }
+  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(navbarlink.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(navbarlink, target, anchor);
+      current = true;
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(navbarlink.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(navbarlink.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(navbarlink, detaching);
+    }
+  };
+} // (41:8) {#if !user}
 
 
 function create_if_block_1(ctx) {
@@ -19506,7 +19621,7 @@ function create_if_block_1(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(navbarlink1);
     }
   };
-} // (45:8) {#if user}
+} // (49:8) {#if user}
 
 
 function create_if_block(ctx) {
@@ -19622,6 +19737,8 @@ function create_fragment(ctx) {
       /*user*/
       ctx[0]) {
         if (if_block0) {
+          if_block0.p(ctx, dirty);
+
           if (dirty &
           /*user*/
           1) {
@@ -26811,7 +26928,7 @@ function get_each_context(ctx, list, i) {
   var child_ctx = ctx.slice();
   child_ctx[3] = list[i];
   return child_ctx;
-} // (71:6) {:else}
+} // (72:6) {:else}
 
 
 function create_else_block_1(ctx) {
@@ -26931,7 +27048,7 @@ function create_if_block(ctx) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(if_block_anchor);
     }
   };
-} // (72:8) <CenterAbsolute>
+} // (73:8) <CenterAbsolute>
 
 
 function create_default_slot_3(ctx) {
@@ -26967,7 +27084,7 @@ function create_default_slot_3(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.destroy_component)(circle, detaching);
     }
   };
-} // (57:8) {:else}
+} // (58:8) {:else}
 
 
 function create_else_block(ctx) {
@@ -27095,7 +27212,7 @@ function create_if_block_1(ctx) {
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_1__.detach)(each_1_anchor);
     }
   };
-} // (58:10) <CenterAbsolute>
+} // (59:10) <CenterAbsolute>
 
 
 function create_default_slot_2(ctx) {
@@ -27151,7 +27268,10 @@ function create_each_block(key_1, ctx) {
       ctx[3].specie,
       sex:
       /*pet*/
-      ctx[3].sex
+      ctx[3].sex,
+      dob:
+      /*pet*/
+      ctx[3].date_of_birth
     }
   });
   return {
@@ -27192,6 +27312,11 @@ function create_each_block(key_1, ctx) {
       1) petcard_changes.sex =
       /*pet*/
       ctx[3].sex;
+      if (dirty &
+      /*$petsStore*/
+      1) petcard_changes.dob =
+      /*pet*/
+      ctx[3].date_of_birth;
       petcard.$set(petcard_changes);
     },
     i: function i(local) {

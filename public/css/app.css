@@ -2017,17 +2017,11 @@ body[dir="rtl"] .checkbox:checked,
 .mt-5 {
   margin-top: 1.25rem;
 }
-.mb-2 {
-  margin-bottom: 0.5rem;
-}
-.mt-12 {
-  margin-top: 3rem;
-}
-.mt-16 {
-  margin-top: 4rem;
-}
 .mb-5 {
   margin-bottom: 1.25rem;
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
 }
 .block {
   display: block;
@@ -2077,6 +2071,9 @@ body[dir="rtl"] .checkbox:checked,
 .h-6 {
   height: 1.5rem;
 }
+.h-14 {
+  height: 3.5rem;
+}
 .h-fit {
   height: -webkit-fit-content;
   height: -moz-fit-content;
@@ -2090,12 +2087,6 @@ body[dir="rtl"] .checkbox:checked,
 }
 .h-4 {
   height: 1rem;
-}
-.h-14 {
-  height: 3.5rem;
-}
-.max-h-14 {
-  max-height: 3.5rem;
 }
 .max-h-20 {
   max-height: 5rem;
@@ -2445,9 +2436,6 @@ body[dir="rtl"] .checkbox:checked,
 .p-0 {
   padding: 0px;
 }
-.p-10 {
-  padding: 2.5rem;
-}
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -2472,6 +2460,10 @@ body[dir="rtl"] .checkbox:checked,
   padding-left: 0.75rem;
   padding-right: 0.75rem;
 }
+.py-10 {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
 .py-6 {
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
@@ -2492,15 +2484,14 @@ body[dir="rtl"] .checkbox:checked,
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
 }
-.py-10 {
-  padding-top: 2.5rem;
-  padding-bottom: 2.5rem;
-}
 .pt-6 {
   padding-top: 1.5rem;
 }
 .pt-8 {
   padding-top: 2rem;
+}
+.pr-2 {
+  padding-right: 0.5rem;
 }
 .pl-2 {
   padding-left: 0.5rem;
@@ -2528,9 +2519,6 @@ body[dir="rtl"] .checkbox:checked,
 }
 .pb-3 {
   padding-bottom: 0.75rem;
-}
-.pr-2 {
-  padding-right: 0.5rem;
 }
 .text-left {
   text-align: left;
@@ -3267,16 +3255,16 @@ body[dir="rtl"] .checkbox:checked,
     padding: 1rem;
   }
 
+  .sm\:p-10 {
+    padding: 2.5rem;
+  }
+
   .sm\:p-0 {
     padding: 0px;
   }
 
   .sm\:p-6 {
     padding: 1.5rem;
-  }
-
-  .sm\:p-10 {
-    padding: 2.5rem;
   }
 
   .sm\:px-6 {
@@ -3375,16 +3363,12 @@ body[dir="rtl"] .checkbox:checked,
     display: grid;
   }
 
-  .md\:h-6 {
-    height: 1.5rem;
-  }
-
   .md\:h-20 {
     height: 5rem;
   }
 
-  .md\:max-h-20 {
-    max-height: 5rem;
+  .md\:h-6 {
+    height: 1.5rem;
   }
 
   .md\:w-full {
@@ -3463,11 +3447,6 @@ body[dir="rtl"] .checkbox:checked,
   .md\:px-10 {
     padding-left: 2.5rem;
     padding-right: 2.5rem;
-  }
-
-  .md\:text-3xl {
-    font-size: 1.875rem;
-    line-height: 2.25rem;
   }
 
   .md\:text-lg {

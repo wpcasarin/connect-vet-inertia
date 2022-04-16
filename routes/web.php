@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PetController;
+use App\Http\Controllers\VetController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,6 +26,8 @@ Route::get('/about', function () {
 
 Route::middleware('auth')->group(function () {
     Route::apiResource('pets', PetController::class);
+    Route::apiResource('vets', VetController::class)->only(['index', 'show']);
+    //pages
     Route::get('/my-pets', function () {
         return Inertia::render('Pets', ["user" => Auth::user()]);
     });

@@ -51,7 +51,8 @@
                 id={pet.id}
                 name={pet.name}
                 specie={pet.specie}
-                sex={pet.sex} />
+                sex={pet.sex}
+                dob={pet.date_of_birth} />
             </div>
           {/each}
         {:else}

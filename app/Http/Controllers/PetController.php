@@ -36,6 +36,10 @@ class PetController extends Controller
             return $request->user()->pets;
         }
 
+        if ($request->user()->type === 'VET') {
+            return $request->user()->patients;
+        }
+
         return $this->pet->paginate(10);
     }
 
@@ -95,7 +99,9 @@ class PetController extends Controller
             //     'message' => 'Unauthorized.'
             // ], Response::HTTP_UNAUTHORIZED);
         }
-        return Inertia::render('PetProfile', ["user" => Auth::user(), "pet" => $pet]);
+        if ($request->user()->type === 'TUTOR') {
+            return Inertia::render('PetProfile', ["user" => Auth::user(), "pet" => $pet]);
+        }
     }
 
     /**

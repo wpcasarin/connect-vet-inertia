@@ -3,7 +3,6 @@
   import { page } from '@inertiajs/inertia-svelte';
   // local imports
   import Form from '../basics/Form.svelte';
-  import FormLogo from '../logos/FormLogo.svelte';
   import FormAlert from '../display/FormAlert.svelte';
   import FormInput from '../inputs/FormInput.svelte';
   import FormHeader from '../headers/FormHeader.svelte';

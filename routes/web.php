@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PetController;
+use App\Http\Controllers\VaccineRecordController;
 use App\Http\Controllers\VetController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,7 @@ Route::get('/', function () {
 Route::get('/about', function () {
     return Inertia::render('About', ["user" => Auth::user()]);
 });
+
 
 Route::middleware('auth')->group(function () {
     Route::apiResource('pets', PetController::class);

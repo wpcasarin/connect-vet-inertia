@@ -12,6 +12,7 @@ class Pet extends Model
 
     protected $fillable = [
         'user_id',
+        'vet_id',
         'name',
         'sex',
         'specie',
@@ -25,6 +26,11 @@ class Pet extends Model
 
     public function vet()
     {
-        return $this->hasOne(Vet::class);
+        return $this->belongsTo(Vet::class);
+    }
+
+    public function vaccines()
+    {
+        return $this->hasMany(VaccineRecord::class);
     }
 }

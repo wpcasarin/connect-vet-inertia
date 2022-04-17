@@ -2,7 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Admin;
+use App\Models\Pet;
+use App\Models\Tutor;
+use App\Models\VaccineRecord;
+use App\Models\Vet;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,11 +18,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\Admin::factory(1)->create();
-        \App\Models\Vet::factory(10)
+        // $admin = Admin::factory(1)->create();
+        Vet::factory(10)->create();
+        Tutor::factory(5)
+            ->hasPets(9)
             ->create();
-        \App\Models\Tutor::factory(5)
-            ->hasPets(10)
+        VaccineRecord::factory(50)
             ->create();
     }
 }

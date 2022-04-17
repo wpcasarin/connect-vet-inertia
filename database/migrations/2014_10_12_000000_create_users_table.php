@@ -26,7 +26,7 @@ return new class extends Migration
             // tutor
             $table->string('tutor_cpf')->unique()->nullable();
             // vet
-            $table->string('vet_crmv')->unique()->nullable();
+            $table->string('vet_crmv')->index()->unique()->nullable();
             // extra info fields
             $table->rememberToken();
             $table->softDeletes();

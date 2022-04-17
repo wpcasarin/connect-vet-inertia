@@ -25,7 +25,7 @@ class PetFactory extends Factory
             'name' => $this->faker->firstName(),
             'specie' => $species[rand(0, 1)],
             'sex' => $sex[rand(0, 1)],
-            'date_of_birth' => $birth,
+            'date_of_birth' => Carbon::parse($birth)->toDateString()
         ];
     }
 }

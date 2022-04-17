@@ -100,7 +100,12 @@ class PetController extends Controller
             // ], Response::HTTP_UNAUTHORIZED);
         }
         if ($request->user()->type === 'TUTOR') {
-            return Inertia::render('PetProfile', ["user" => Auth::user(), "pet" => $pet]);
+            return Inertia::render('PetProfile', [
+                "user" => Auth::user(),
+                "pet" => $pet,
+                "vaccines" => $pet->vaccines,
+                "vet" => $pet->vet
+            ]);
         }
     }
 
@@ -126,9 +131,6 @@ class PetController extends Controller
             'date_of_birth' => 'date',
         ]);
 
-        if ($request->date_of_birth) {
-            $pet->update(['age' => Carbon::parse($validated['date_of_birth'])->diff(Carbon::now())->y]);
-        }
 
         $pet->update($request->all());
 

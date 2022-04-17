@@ -7,6 +7,8 @@
   import Guests from '../layouts/Guests.svelte';
   import PageContentContainer from '../components/containers/PageContentContainer.svelte';
   import PetProfileContent from '../components/layout/PetProfileContent.svelte';
+  import VaccinationCardRecords from '../components/layout/VaccinationCardRecords.svelte';
+  import VetProfile from '../components/layout/VetProfile.svelte';
   import { page } from '@inertiajs/inertia-svelte';
   // states
   let pages = {
@@ -22,8 +24,7 @@
 
 <Guests>
   <PageContentContainer>
-    <aside
-      class="flex max-w-fit flex-shrink flex-col border-r-2 md:max-w-xs md:flex-grow">
+    <aside class="flex flex-col border-r-2 md:max-w-xs md:flex-grow">
       <section
         class="mt-10 flex w-full flex-col items-center gap-x-6 gap-y-3 pr-2 md:flex-row md:p-0">
         <div class="avatar">
@@ -79,18 +80,23 @@
         </ul>
       </nav>
     </aside>
-    <main class="flex-grow bg-base-100 px-4 py-10 sm:p-10">
+    <main class="flex-grow bg-base-100 px-4 py-10">
       {#if pages.profile}
         <PetProfileContent />
       {:else if pages.vaccination}
-        <h1>vaccination records</h1>
+        <VaccinationCardRecords />
       {:else}
-        <h1>vet info</h1>
+        <VetProfile />
       {/if}
     </main>
   </PageContentContainer>
 </Guests>
 
 <style>
-  /* your styles go here */
+  @media (min-width: 768px) {
+    aside {
+      min-width: 280px;
+      max-width: 280px;
+    }
+  }
 </style>

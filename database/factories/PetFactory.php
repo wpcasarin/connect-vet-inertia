@@ -19,7 +19,7 @@ class PetFactory extends Factory
     {
         $species = ['DOG', 'CAT'];
         $sex = ['F', 'M'];
-        $birth = $this->faker->date();
+        $birth = $this->faker->dateTimeThisDecade();
         $age = Carbon::parse($birth)->diff(Carbon::now())->y;
         return [
             'name' => $this->faker->firstName(),

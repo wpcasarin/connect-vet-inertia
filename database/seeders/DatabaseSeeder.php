@@ -15,11 +15,10 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         \App\Models\Admin::factory(1)->create();
-        \App\Models\Tutor::factory(3)
-            ->hasPets(10)
+        \App\Models\Vet::factory(10)
             ->create();
-        \App\Models\Vet::factory(1)
-            // ->hasPatients(1)
+        \App\Models\Tutor::factory(5)
+            ->hasPets(10)
             ->create();
     }
 }

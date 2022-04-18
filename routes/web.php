@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PetController;
-use App\Http\Controllers\VaccineRecordController;
 use App\Http\Controllers\VetController;
+use App\Models\Vet;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -32,6 +33,9 @@ Route::middleware('auth')->group(function () {
     //pages
     Route::get('/my-pets', function () {
         return Inertia::render('Pets', ["user" => Auth::user()]);
+    });
+    Route::get('/my-patients', function () {
+        return Inertia::render('Patients', ["user" => Auth::user()]);
     });
 });
 

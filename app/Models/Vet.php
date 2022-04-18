@@ -20,6 +20,6 @@ class Vet extends User
 
     public function patients()
     {
-        return $this->hasMany(Pet::class);
+        return $this->hasMany(Pet::class, 'vet_id');
     }
 }

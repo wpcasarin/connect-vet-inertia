@@ -28,7 +28,7 @@
               {#if user.type === 'TUTOR'}
                 <NavBarLink to="/my-pets" text="pets" />
               {:else}
-                <NavBarLink to="/my-pets" text="patients" />
+                <NavBarLink to="/my-patients" text="patients" />
               {/if}
               <NavBarLink to="/about" text="about" />
             </ul>

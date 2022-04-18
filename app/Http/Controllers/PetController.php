@@ -107,6 +107,12 @@ class PetController extends Controller
                 "vet" => $pet->vet
             ]);
         }
+        if ($request->user()->type === 'VET') {
+            return response([
+                "pet" => $pet,
+                "vaccines" => $pet->vaccines
+            ], 200);
+        }
     }
 
     /**

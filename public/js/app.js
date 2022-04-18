@@ -15936,7 +15936,7 @@ function create_fragment(ctx) {
       section = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("section");
       if (default_slot) default_slot.c();
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(section, "id", "pets-container");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(section, "class", "flex flex-col gap-8 lg:grid lg:grid-cols-2 xl:grid-cols-3");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(section, "class", "mb-5 flex flex-col gap-8 lg:grid lg:grid-cols-2 xl:grid-cols-3");
     },
     m: function m(target, anchor) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, section, anchor);

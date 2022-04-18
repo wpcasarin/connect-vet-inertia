@@ -12,6 +12,8 @@ class VaccineRecord extends Model
 
     protected $fillable = [
         'name',
+        'pet_id',
+        'vet_id',
         'next_dose'
     ];
 

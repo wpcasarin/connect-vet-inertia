@@ -70,6 +70,7 @@
           <article class="col-span-6 md:border-l-2 lg:col-span-7">
             {#if currentPatient}
               <PatientProfile
+                id={currentPatient.id}
                 specie={currentPatient.specie}
                 name={currentPatient.name}
                 sex={currentPatient.sex}
@@ -87,7 +88,7 @@
           <img
             class="max-w-md"
             src="/assets/no_data_illustration.svg"
-            alt="No pets found"
+            alt="No patients found"
             width="100%"
             height="auto" />
         </CenterAbsolute>

@@ -14,7 +14,12 @@
       class="space-y-1 px-2 pt-2 pb-3">
       {#if $page['props']['user']}
         <MobileMenuLink to="/" text="home" />
-        <MobileMenuLink to="/my-pets" text="pets" />
+        {#if $page.props.user.type === 'TUTOR'}
+          <MobileMenuLink to="/my-pets" text="pets" />
+        {:else}
+          <MobileMenuLink to="/my-patients" text="patients" />
+        {/if}
+
         <MobileMenuLink to="/about" text="about" />
       {:else}
         <MobileMenuLink to="/login" text="login" />

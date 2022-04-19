@@ -12,7 +12,7 @@
 </p>
 
 {#if $page['props']['vaccines'] && $page['props']['vaccines'][0]}
-  <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+  <section class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
     {#each $page['props']['vaccines'] as vaccine (vaccine.id)}
       <VaccineRecord
         vaccine={vaccine.name}

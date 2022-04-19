@@ -2,6 +2,7 @@
   import FaRegAddressCard from 'svelte-icons/fa/FaRegAddressCard.svelte';
   import TiPipette from 'svelte-icons/ti/TiPipette.svelte';
   import FaUser from 'svelte-icons/fa/FaUser.svelte';
+  import { fade } from 'svelte/transition';
   // local imports
   import PetProfileSideButton from '../components/buttons/PetProfileSideButton.svelte';
   import Guests from '../layouts/Guests.svelte';
@@ -28,7 +29,7 @@
       <section
         class="mt-10 flex w-full flex-col items-center gap-x-6 gap-y-3 pr-2 md:flex-row md:p-0">
         <div class="avatar">
-          <div class="mask mask-squircle aspect-square h-14 md:h-20">
+          <div class="mask mask-squircle aspect-square h-12 md:h-20">
             <img
               src={`/assets/${
                 $page['props']['pet'].specie === 'DOG' ? 'dog' : 'cat'
@@ -82,11 +83,17 @@
     </aside>
     <main class="flex-grow bg-base-100 px-4 py-10">
       {#if pages.profile}
-        <PetProfileContent />
+        <section in:fade={{ duration: 300, delay: 200 }}>
+          <PetProfileContent />
+        </section>
       {:else if pages.vaccination}
-        <VaccinationCardRecords />
+        <section in:fade={{ duration: 300, delay: 200 }}>
+          <VaccinationCardRecords />
+        </section>
       {:else}
-        <VetProfile />
+        <section in:fade={{ duration: 300, delay: 200 }}>
+          <VetProfile />
+        </section>
       {/if}
     </main>
   </PageContentContainer>

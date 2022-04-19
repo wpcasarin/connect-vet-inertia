@@ -15084,7 +15084,7 @@ function create_else_block(ctx) {
       t1 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.text)(
       /*text*/
       ctx[1]);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span0, "class", "mr-2 aspect-square h-8 md:mr-4 md:h-6");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span0, "class", "mr-2 aspect-square h-6 md:mr-4");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span1, "class", "hidden flex-grow text-xl font-medium md:block");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div0, "class", "mx-auto flex h-12 cursor-pointer items-center rounded-2xl pl-2 text-gray-700 transition-all hover:bg-gray-200 focus:bg-gray-200 active:scale-95 md:mr-8 md:w-full");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div1, "class", "flex w-full items-center");
@@ -15180,11 +15180,11 @@ function create_if_block(ctx) {
       ctx[1]);
       t2 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
       span2 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("span");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span0, "class", "mr-2 aspect-square h-8 md:mr-4 md:h-6");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span0, "class", "mr-2 aspect-square h-6 md:mr-4");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span1, "class", "hidden flex-grow text-xl font-medium md:block");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div0, "class", "mx-auto flex h-12 cursor-pointer items-center rounded-2xl pl-2 text-primary transition-all hover:bg-gray-200 focus:bg-gray-200 active:scale-95 md:mr-8 md:w-full");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(span2, "class", "h-10 w-2 rounded-l-xl bg-primary");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div1, "class", "flex w-full items-center");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div1, "class", "flex w-full items-center ");
     },
     m: function m(target, anchor) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, div1, anchor);
@@ -22222,7 +22222,7 @@ function create_if_block(ctx) {
   var if_block;
   var div_transition;
   var current;
-  var if_block_creators = [create_if_block_1, create_else_block];
+  var if_block_creators = [create_if_block_1, create_else_block_1];
   var if_blocks = [];
 
   function select_block_type(ctx, dirty) {
@@ -22250,7 +22250,9 @@ function create_if_block(ctx) {
       var previous_block_index = current_block_type_index;
       current_block_type_index = select_block_type(ctx, dirty);
 
-      if (current_block_type_index !== previous_block_index) {
+      if (current_block_type_index === previous_block_index) {
+        if_blocks[current_block_type_index].p(ctx, dirty);
+      } else {
         (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
         (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_blocks[previous_block_index], 1, 1, function () {
           if_blocks[previous_block_index] = null;
@@ -22261,7 +22263,9 @@ function create_if_block(ctx) {
         if (!if_block) {
           if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
           if_block.c();
-        } else {}
+        } else {
+          if_block.p(ctx, dirty);
+        }
 
         (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block, 1);
         if_block.m(div, null);
@@ -22296,10 +22300,10 @@ function create_if_block(ctx) {
       if (detaching && div_transition) div_transition.end();
     }
   };
-} // (19:6) {:else}
+} // (24:6) {:else}
 
 
-function create_else_block(ctx) {
+function create_else_block_1(ctx) {
   var mobilemenulink0;
   var t;
   var mobilemenulink1;
@@ -22328,6 +22332,7 @@ function create_else_block(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(mobilemenulink1, target, anchor);
       current = true;
     },
+    p: svelte_internal__WEBPACK_IMPORTED_MODULE_0__.noop,
     i: function i(local) {
       if (current) return;
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(mobilemenulink0.$$.fragment, local);
@@ -22351,9 +22356,10 @@ function create_else_block(ctx) {
 function create_if_block_1(ctx) {
   var mobilemenulink0;
   var t0;
-  var mobilemenulink1;
+  var current_block_type_index;
+  var if_block;
   var t1;
-  var mobilemenulink2;
+  var mobilemenulink1;
   var current;
   mobilemenulink0 = new _buttons_MobileMenuLink_svelte__WEBPACK_IMPORTED_MODULE_4__["default"]({
     props: {
@@ -22361,13 +22367,19 @@ function create_if_block_1(ctx) {
       text: "home"
     }
   });
+  var if_block_creators = [create_if_block_2, create_else_block];
+  var if_blocks = [];
+
+  function select_block_type_1(ctx, dirty) {
+    if (
+    /*$page*/
+    ctx[1].props.user.type === 'TUTOR') return 0;
+    return 1;
+  }
+
+  current_block_type_index = select_block_type_1(ctx, -1);
+  if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
   mobilemenulink1 = new _buttons_MobileMenuLink_svelte__WEBPACK_IMPORTED_MODULE_4__["default"]({
-    props: {
-      to: "/my-pets",
-      text: "pets"
-    }
-  });
-  mobilemenulink2 = new _buttons_MobileMenuLink_svelte__WEBPACK_IMPORTED_MODULE_4__["default"]({
     props: {
       to: "/about",
       text: "about"
@@ -22377,37 +22389,124 @@ function create_if_block_1(ctx) {
     c: function c() {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(mobilemenulink0.$$.fragment);
       t0 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(mobilemenulink1.$$.fragment);
+      if_block.c();
       t1 = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.space)();
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(mobilemenulink2.$$.fragment);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(mobilemenulink1.$$.fragment);
     },
     m: function m(target, anchor) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(mobilemenulink0, target, anchor);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t0, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(mobilemenulink1, target, anchor);
+      if_blocks[current_block_type_index].m(target, anchor);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, t1, anchor);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(mobilemenulink2, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(mobilemenulink1, target, anchor);
       current = true;
+    },
+    p: function p(ctx, dirty) {
+      var previous_block_index = current_block_type_index;
+      current_block_type_index = select_block_type_1(ctx, dirty);
+
+      if (current_block_type_index !== previous_block_index) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.group_outros)();
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_blocks[previous_block_index], 1, 1, function () {
+          if_blocks[previous_block_index] = null;
+        });
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.check_outros)();
+        if_block = if_blocks[current_block_type_index];
+
+        if (!if_block) {
+          if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+          if_block.c();
+        } else {}
+
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block, 1);
+        if_block.m(t1.parentNode, t1);
+      }
     },
     i: function i(local) {
       if (current) return;
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(mobilemenulink0.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(if_block);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(mobilemenulink1.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(mobilemenulink2.$$.fragment, local);
       current = true;
     },
     o: function o(local) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(mobilemenulink0.$$.fragment, local);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(if_block);
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(mobilemenulink1.$$.fragment, local);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(mobilemenulink2.$$.fragment, local);
       current = false;
     },
     d: function d(detaching) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(mobilemenulink0, detaching);
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t0);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(mobilemenulink1, detaching);
+      if_blocks[current_block_type_index].d(detaching);
       if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(t1);
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(mobilemenulink2, detaching);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(mobilemenulink1, detaching);
+    }
+  };
+} // (19:8) {:else}
+
+
+function create_else_block(ctx) {
+  var mobilemenulink;
+  var current;
+  mobilemenulink = new _buttons_MobileMenuLink_svelte__WEBPACK_IMPORTED_MODULE_4__["default"]({
+    props: {
+      to: "/my-patients",
+      text: "patients"
+    }
+  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(mobilemenulink.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(mobilemenulink, target, anchor);
+      current = true;
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(mobilemenulink.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(mobilemenulink.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(mobilemenulink, detaching);
+    }
+  };
+} // (17:8) {#if $page.props.user.type === 'TUTOR'}
+
+
+function create_if_block_2(ctx) {
+  var mobilemenulink;
+  var current;
+  mobilemenulink = new _buttons_MobileMenuLink_svelte__WEBPACK_IMPORTED_MODULE_4__["default"]({
+    props: {
+      to: "/my-pets",
+      text: "pets"
+    }
+  });
+  return {
+    c: function c() {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(mobilemenulink.$$.fragment);
+    },
+    m: function m(target, anchor) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(mobilemenulink, target, anchor);
+      current = true;
+    },
+    i: function i(local) {
+      if (current) return;
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(mobilemenulink.$$.fragment, local);
+      current = true;
+    },
+    o: function o(local) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_out)(mobilemenulink.$$.fragment, local);
+      current = false;
+    },
+    d: function d(detaching) {
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(mobilemenulink, detaching);
     }
   };
 }
@@ -23996,7 +24095,7 @@ function create_if_block(ctx) {
         each_blocks[_i].c();
       }
 
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(section, "class", "grid gap-3 sm:grid-cols-2 xl:grid-cols-3");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(section, "class", "grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3");
     },
     m: function m(target, anchor) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, section, anchor);
@@ -31360,13 +31459,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var svelte_icons_fa_FaRegAddressCard_svelte__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! svelte-icons/fa/FaRegAddressCard.svelte */ "./node_modules/svelte-icons/fa/FaRegAddressCard.svelte");
 /* harmony import */ var svelte_icons_ti_TiPipette_svelte__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! svelte-icons/ti/TiPipette.svelte */ "./node_modules/svelte-icons/ti/TiPipette.svelte");
 /* harmony import */ var svelte_icons_fa_FaUser_svelte__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! svelte-icons/fa/FaUser.svelte */ "./node_modules/svelte-icons/fa/FaUser.svelte");
-/* harmony import */ var _components_buttons_PetProfileSideButton_svelte__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/buttons/PetProfileSideButton.svelte */ "./resources/js/components/buttons/PetProfileSideButton.svelte");
-/* harmony import */ var _layouts_Guests_svelte__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../layouts/Guests.svelte */ "./resources/js/layouts/Guests.svelte");
-/* harmony import */ var _components_containers_PageContentContainer_svelte__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../components/containers/PageContentContainer.svelte */ "./resources/js/components/containers/PageContentContainer.svelte");
-/* harmony import */ var _components_layout_PetProfileContent_svelte__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../components/layout/PetProfileContent.svelte */ "./resources/js/components/layout/PetProfileContent.svelte");
-/* harmony import */ var _components_layout_VaccinationCardRecords_svelte__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../components/layout/VaccinationCardRecords.svelte */ "./resources/js/components/layout/VaccinationCardRecords.svelte");
-/* harmony import */ var _components_layout_VetProfile_svelte__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../components/layout/VetProfile.svelte */ "./resources/js/components/layout/VetProfile.svelte");
-/* harmony import */ var _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @inertiajs/inertia-svelte */ "./node_modules/@inertiajs/inertia-svelte/src/index.js");
+/* harmony import */ var svelte_transition__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! svelte/transition */ "./node_modules/svelte/transition/index.mjs");
+/* harmony import */ var _components_buttons_PetProfileSideButton_svelte__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../components/buttons/PetProfileSideButton.svelte */ "./resources/js/components/buttons/PetProfileSideButton.svelte");
+/* harmony import */ var _layouts_Guests_svelte__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../layouts/Guests.svelte */ "./resources/js/layouts/Guests.svelte");
+/* harmony import */ var _components_containers_PageContentContainer_svelte__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../components/containers/PageContentContainer.svelte */ "./resources/js/components/containers/PageContentContainer.svelte");
+/* harmony import */ var _components_layout_PetProfileContent_svelte__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../components/layout/PetProfileContent.svelte */ "./resources/js/components/layout/PetProfileContent.svelte");
+/* harmony import */ var _components_layout_VaccinationCardRecords_svelte__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../components/layout/VaccinationCardRecords.svelte */ "./resources/js/components/layout/VaccinationCardRecords.svelte");
+/* harmony import */ var _components_layout_VetProfile_svelte__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../components/layout/VetProfile.svelte */ "./resources/js/components/layout/VetProfile.svelte");
+/* harmony import */ var _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @inertiajs/inertia-svelte */ "./node_modules/@inertiajs/inertia-svelte/src/index.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -31405,6 +31505,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+
  // local imports
 
 
@@ -31417,7 +31518,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function add_css(target) {
   (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.append_styles)(target, "svelte-16h91va", "@media(min-width: 768px){aside.svelte-16h91va{min-width:280px;max-width:280px}}");
-} // (54:12) <PetProfileSideButton text="Profile" bind:active={pages.profile}>
+} // (55:12) <PetProfileSideButton text="Profile" bind:active={pages.profile}>
 
 
 function create_default_slot_4(ctx) {
@@ -31445,7 +31546,7 @@ function create_default_slot_4(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(fauser, detaching);
     }
   };
-} // (64:12) <PetProfileSideButton               text="Vaccination Card"               bind:active={pages.vaccination}>
+} // (65:12) <PetProfileSideButton               text="Vaccination Card"               bind:active={pages.vaccination}>
 
 
 function create_default_slot_3(ctx) {
@@ -31473,7 +31574,7 @@ function create_default_slot_3(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(tipipette, detaching);
     }
   };
-} // (76:12) <PetProfileSideButton text="Vet Info" bind:active={pages.vetInfo}>
+} // (77:12) <PetProfileSideButton text="Vet Info" bind:active={pages.vetInfo}>
 
 
 function create_default_slot_2(ctx) {
@@ -31501,24 +31602,39 @@ function create_default_slot_2(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(faregaddresscard, detaching);
     }
   };
-} // (88:6) {:else}
+} // (93:6) {:else}
 
 
 function create_else_block(ctx) {
+  var section;
   var vetprofile;
+  var section_intro;
   var current;
-  vetprofile = new _components_layout_VetProfile_svelte__WEBPACK_IMPORTED_MODULE_9__["default"]({});
+  vetprofile = new _components_layout_VetProfile_svelte__WEBPACK_IMPORTED_MODULE_10__["default"]({});
   return {
     c: function c() {
+      section = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("section");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(vetprofile.$$.fragment);
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(vetprofile, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, section, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(vetprofile, section, null);
       current = true;
     },
     i: function i(local) {
       if (current) return;
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(vetprofile.$$.fragment, local);
+
+      if (!section_intro) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_render_callback)(function () {
+          section_intro = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_in_transition)(section, svelte_transition__WEBPACK_IMPORTED_MODULE_4__.fade, {
+            duration: 300,
+            delay: 200
+          });
+          section_intro.start();
+        });
+      }
+
       current = true;
     },
     o: function o(local) {
@@ -31526,27 +31642,43 @@ function create_else_block(ctx) {
       current = false;
     },
     d: function d(detaching) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(vetprofile, detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(section);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(vetprofile);
     }
   };
-} // (86:34) 
+} // (89:34) 
 
 
 function create_if_block_1(ctx) {
+  var section;
   var vaccinationcardrecords;
+  var section_intro;
   var current;
-  vaccinationcardrecords = new _components_layout_VaccinationCardRecords_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({});
+  vaccinationcardrecords = new _components_layout_VaccinationCardRecords_svelte__WEBPACK_IMPORTED_MODULE_9__["default"]({});
   return {
     c: function c() {
+      section = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("section");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(vaccinationcardrecords.$$.fragment);
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(vaccinationcardrecords, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, section, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(vaccinationcardrecords, section, null);
       current = true;
     },
     i: function i(local) {
       if (current) return;
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(vaccinationcardrecords.$$.fragment, local);
+
+      if (!section_intro) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_render_callback)(function () {
+          section_intro = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_in_transition)(section, svelte_transition__WEBPACK_IMPORTED_MODULE_4__.fade, {
+            duration: 300,
+            delay: 200
+          });
+          section_intro.start();
+        });
+      }
+
       current = true;
     },
     o: function o(local) {
@@ -31554,27 +31686,43 @@ function create_if_block_1(ctx) {
       current = false;
     },
     d: function d(detaching) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(vaccinationcardrecords, detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(section);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(vaccinationcardrecords);
     }
   };
-} // (84:6) {#if pages.profile}
+} // (85:6) {#if pages.profile}
 
 
 function create_if_block(ctx) {
+  var section;
   var petprofilecontent;
+  var section_intro;
   var current;
-  petprofilecontent = new _components_layout_PetProfileContent_svelte__WEBPACK_IMPORTED_MODULE_7__["default"]({});
+  petprofilecontent = new _components_layout_PetProfileContent_svelte__WEBPACK_IMPORTED_MODULE_8__["default"]({});
   return {
     c: function c() {
+      section = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.element)("section");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_component)(petprofilecontent.$$.fragment);
     },
     m: function m(target, anchor) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(petprofilecontent, target, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.insert)(target, section, anchor);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.mount_component)(petprofilecontent, section, null);
       current = true;
     },
     i: function i(local) {
       if (current) return;
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.transition_in)(petprofilecontent.$$.fragment, local);
+
+      if (!section_intro) {
+        (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.add_render_callback)(function () {
+          section_intro = (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.create_in_transition)(section, svelte_transition__WEBPACK_IMPORTED_MODULE_4__.fade, {
+            duration: 300,
+            delay: 200
+          });
+          section_intro.start();
+        });
+      }
+
       current = true;
     },
     o: function o(local) {
@@ -31582,10 +31730,11 @@ function create_if_block(ctx) {
       current = false;
     },
     d: function d(detaching) {
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(petprofilecontent, detaching);
+      if (detaching) (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.detach)(section);
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.destroy_component)(petprofilecontent);
     }
   };
-} // (26:2) <PageContentContainer>
+} // (27:2) <PageContentContainer>
 
 
 function create_default_slot_1(ctx) {
@@ -31648,7 +31797,7 @@ function create_default_slot_1(ctx) {
     ctx[0].profile;
   }
 
-  petprofilesidebutton0 = new _components_buttons_PetProfileSideButton_svelte__WEBPACK_IMPORTED_MODULE_4__["default"]({
+  petprofilesidebutton0 = new _components_buttons_PetProfileSideButton_svelte__WEBPACK_IMPORTED_MODULE_5__["default"]({
     props: petprofilesidebutton0_props
   });
   svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
@@ -31678,7 +31827,7 @@ function create_default_slot_1(ctx) {
     ctx[0].vaccination;
   }
 
-  petprofilesidebutton1 = new _components_buttons_PetProfileSideButton_svelte__WEBPACK_IMPORTED_MODULE_4__["default"]({
+  petprofilesidebutton1 = new _components_buttons_PetProfileSideButton_svelte__WEBPACK_IMPORTED_MODULE_5__["default"]({
     props: petprofilesidebutton1_props
   });
   svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
@@ -31708,7 +31857,7 @@ function create_default_slot_1(ctx) {
     ctx[0].vetInfo;
   }
 
-  petprofilesidebutton2 = new _components_buttons_PetProfileSideButton_svelte__WEBPACK_IMPORTED_MODULE_4__["default"]({
+  petprofilesidebutton2 = new _components_buttons_PetProfileSideButton_svelte__WEBPACK_IMPORTED_MODULE_5__["default"]({
     props: petprofilesidebutton2_props
   });
   svelte_internal__WEBPACK_IMPORTED_MODULE_0__.binding_callbacks.push(function () {
@@ -31761,7 +31910,7 @@ function create_default_slot_1(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "alt", "Pet");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "width", "100%");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(img, "height", "auto");
-      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div0, "class", "mask mask-squircle aspect-square h-14 md:h-20");
+      (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div0, "class", "mask mask-squircle aspect-square h-12 md:h-20");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(div1, "class", "avatar");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(h2, "class", "hidden truncate text-3xl font-bold text-neutral md:block");
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.attr)(section, "class", "mt-10 flex w-full flex-col items-center gap-x-6 gap-y-3 pr-2 md:flex-row md:p-0");
@@ -31942,13 +32091,13 @@ function create_default_slot_1(ctx) {
       (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.run_all)(dispose);
     }
   };
-} // (25:0) <Guests>
+} // (26:0) <Guests>
 
 
 function create_default_slot(ctx) {
   var pagecontentcontainer;
   var current;
-  pagecontentcontainer = new _components_containers_PageContentContainer_svelte__WEBPACK_IMPORTED_MODULE_6__["default"]({
+  pagecontentcontainer = new _components_containers_PageContentContainer_svelte__WEBPACK_IMPORTED_MODULE_7__["default"]({
     props: {
       $$slots: {
         "default": [create_default_slot_1]
@@ -32003,7 +32152,7 @@ function create_fragment(ctx) {
   document.title = title_value = "ConnectVet ─ " +
   /*$page*/
   ctx[1]['props']['pet'].name + "'s Profile";
-  guests = new _layouts_Guests_svelte__WEBPACK_IMPORTED_MODULE_5__["default"]({
+  guests = new _layouts_Guests_svelte__WEBPACK_IMPORTED_MODULE_6__["default"]({
     props: {
       $$slots: {
         "default": [create_default_slot]
@@ -32066,7 +32215,7 @@ function create_fragment(ctx) {
 
 function instance($$self, $$props, $$invalidate) {
   var $page;
-  (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.component_subscribe)($$self, _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_10__.page, function ($$value) {
+  (0,svelte_internal__WEBPACK_IMPORTED_MODULE_0__.component_subscribe)($$self, _inertiajs_inertia_svelte__WEBPACK_IMPORTED_MODULE_11__.page, function ($$value) {
     return $$invalidate(1, $page = $$value);
   });
   var pages = {

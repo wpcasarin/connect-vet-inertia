@@ -6,10 +6,10 @@
 </script>
 
 {#if active}
-  <div class="flex w-full items-center">
+  <div class="flex w-full items-center ">
     <div
       class="mx-auto flex h-12 cursor-pointer items-center rounded-2xl pl-2 text-primary transition-all hover:bg-gray-200 focus:bg-gray-200 active:scale-95 md:mr-8 md:w-full">
-      <span class="mr-2 aspect-square h-8 md:mr-4 md:h-6">
+      <span class="mr-2 aspect-square h-6 md:mr-4">
         <slot><IoIosArrowForward /></slot>
       </span>
       <span class="hidden flex-grow text-xl font-medium md:block">
@@ -22,7 +22,7 @@
   <div class="flex w-full items-center" on:click={() => (active = true)}>
     <div
       class="mx-auto flex h-12 cursor-pointer items-center rounded-2xl pl-2 text-gray-700 transition-all hover:bg-gray-200 focus:bg-gray-200 active:scale-95 md:mr-8 md:w-full">
-      <span class="mr-2 aspect-square h-8 md:mr-4 md:h-6">
+      <span class="mr-2 aspect-square h-6 md:mr-4">
         <slot><IoIosArrowForward /></slot>
       </span>
       <span class="hidden flex-grow text-xl font-medium md:block">

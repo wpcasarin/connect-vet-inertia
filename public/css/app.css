@@ -2115,9 +2115,6 @@ body[dir="rtl"] .checkbox:checked,
 .h-6 {
   height: 1.5rem;
 }
-.h-14 {
-  height: 3.5rem;
-}
 .h-fit {
   height: -webkit-fit-content;
   height: -moz-fit-content;
@@ -3526,10 +3523,6 @@ body[dir="rtl"] .checkbox:checked,
 
   .md\:h-20 {
     height: 5rem;
-  }
-
-  .md\:h-6 {
-    height: 1.5rem;
   }
 
   .md\:w-full {
